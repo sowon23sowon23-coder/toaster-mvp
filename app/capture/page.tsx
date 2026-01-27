@@ -147,25 +147,25 @@ export default function CapturePage() {
     <main style={styles.page}>
       <header style={styles.header}>
         <div>
-          <h1 style={styles.h1}>촬영</h1>
-          <p style={styles.sub}>한 장마다 3초 카운트다운 후 자동 촬영 (총 4장)</p>
+          <h1 style={styles.h1}>shooting</h1>
+          <p style={styles.sub}>Automatic shooting after a 3-second countdown for each photo (4 photos total)</p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {!cameraOn ? (
             <button style={styles.primaryBtn} onClick={startCamera}>
-              웹캠 켜기
+              Turn on the webcam
             </button>
           ) : (
             <button style={styles.btn} onClick={stopCamera}>
-              웹캠 끄기
+              Turn off the webcam
             </button>
           )}
           <button style={styles.btn} onClick={reset} disabled={isShooting}>
-            리셋
+            Reset
           </button>
           <Link href="/result" style={{ pointerEvents: canGoNext ? "auto" : "none" }}>
             <button style={styles.btn} disabled={!canGoNext}>
-              다음 →
+              Next →
             </button>
           </Link>
         </div>
@@ -175,17 +175,17 @@ export default function CapturePage() {
         <div style={styles.card}>
           <div style={styles.videoWrap}>
             <video ref={videoRef} style={styles.video} autoPlay muted playsInline />
-            {!cameraOn && <div style={styles.videoOverlay}>웹캠을 켜주세요</div>}
+            {!cameraOn && <div style={styles.videoOverlay}>Start camera</div>}
             {countdown > 0 && (
               <div style={styles.countdown}>
                 {countdown}
                 <div style={{ fontSize: 14, marginTop: 10, opacity: 0.9 }}>
-                  {shotIndex + 1} / 4 촬영 준비
+                  {shotIndex + 1} / 4 Ready to shoot
                 </div>
               </div>
             )}
             {isShooting && countdown === 0 && (
-              <div style={styles.shootingHint}>촬영 중… ({shotIndex}/4)</div>
+              <div style={styles.shootingHint}>Shooting… ({shotIndex}/4)</div>
             )}
           </div>
           <div style={{ display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
@@ -194,11 +194,11 @@ export default function CapturePage() {
               onClick={shoot4WithPerShotCountdown}
               disabled={!cameraOn || isShooting}
             >
-              {isShooting ? "촬영 중..." : "촬영 시작"}
+              {isShooting ? "Shooting…" : "Start shooting"}
             </button>
           </div>
           <div style={{ marginTop: 14 }}>
-            <h3 style={styles.h3}>촬영 미리보기 (4컷)</h3>
+            <h3 style={styles.h3}>Photo Preview (4 shots)</h3>
             <div style={styles.shotsRow}>
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} style={styles.shotBox}>
@@ -213,7 +213,7 @@ export default function CapturePage() {
             </div>
           </div>
           <div style={{ marginTop: 12, fontSize: 12, opacity: 0.75, lineHeight: 1.5 }}>
-            • 4장 촬영이 끝나면 오른쪽 위 <b>다음 →</b> 버튼이 활성화돼요.
+            • After 4 shots, tap top right <b>Next →</b> Button enabled.
           </div>
         </div>
       </section>
