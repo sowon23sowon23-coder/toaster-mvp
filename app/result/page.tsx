@@ -250,22 +250,22 @@ export default function ResultPage() {
     <main style={styles.page}>
       <header style={styles.header}>
         <div>
-          <h1 style={styles.h1}>프레임 & 결과</h1>
-          <p style={styles.sub}>프레임 선택 → 자동 합성 → 저장/다운로드</p>
+          <h1 style={styles.h1}>Frame & Results</h1>
+          <p style={styles.sub}>Select Frame → Auto Compose → Save/Download</p>
         </div>
 
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <Link href="/capture">
-            <button style={styles.btn}>← 촬영으로</button>
+            <button style={styles.btn}>← Back to Camera</button>
           </Link>
           <button style={styles.btn} onClick={saveToDB} disabled={saving || shots.length !== 4}>
             {saving ? "저장 중..." : "저장하기(IndexedDB)"}
           </button>
           <button style={styles.primaryBtn} onClick={downloadFinal} disabled={!finalBlob}>
-            PNG 다운로드
+            PNG Download
           </button>
           <button style={styles.btnDanger} onClick={clearDB} disabled={saving}>
-            저장 삭제
+            Save Delete
           </button>
         </div>
       </header>
@@ -274,7 +274,7 @@ export default function ResultPage() {
 
       <section style={styles.grid}>
         <div style={styles.card}>
-          <h2 style={styles.h2}>프레임 선택 (4개)</h2>
+          <h2 style={styles.h2}>Select Frame (4 items)</h2>
           <div style={styles.frameRow}>
             {FRAMES.map((f) => (
               <button
@@ -298,7 +298,7 @@ export default function ResultPage() {
                     background: "rgba(0,0,0,0.03)",
                   }}
                   onError={() =>
-                    setError(`프레임 파일을 못 찾았어요: ${f.src} (public/frames에 있는지 확인)`)
+                    setError(`Frame file not found.: ${f.src} (Make sure it exists in public/frames)`)
                   }
                 />
               </button>
@@ -306,7 +306,7 @@ export default function ResultPage() {
           </div>
 
           <div style={{ marginTop: 14 }}>
-            <h3 style={styles.h3}>촬영 미리보기</h3>
+            <h3 style={styles.h3}>Camera Preview</h3>
             <div style={styles.shotsRow}>
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} style={styles.shotBox}>
@@ -327,20 +327,20 @@ export default function ResultPage() {
         </div>
 
         <div style={styles.card}>
-          <h2 style={styles.h2}>최종 합성 결과</h2>
+          <h2 style={styles.h2}>Final Result</h2>
           <div style={styles.finalWrap}>
             {loading ? (
-              <div style={styles.finalEmpty}>불러오는 중…</div>
+              <div style={styles.finalEmpty}>Loading…</div>
             ) : finalUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={finalUrl} alt="final" style={styles.finalImg} />
             ) : (
-              <div style={styles.finalEmpty}>결과가 없어요. 촬영부터 해주세요.</div>
+              <div style={styles.finalEmpty}>No results yet. Please start by taking a photo.</div>
             )}
           </div>
 
           <div style={{ marginTop: 12, fontSize: 12, opacity: 0.8, lineHeight: 1.5 }}>
-            • 프레임 PNG는 1200×1800 투명 배경이면 가장 예쁘게 맞아요.
+            • Frame PNGs look best at 1200×1800 with a transparent background.
           </div>
         </div>
       </section>
