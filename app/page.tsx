@@ -5,10 +5,10 @@ export default function Home() {
     <main style={{ minHeight: "100vh", display: "grid", placeItems: "center" }}>
       <div style={{ textAlign: "center" }}>
         <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 10 }}>
-          Toaster MVP
+          Yogurtland Photo
         </h1>
         <p style={{ opacity: 0.7, marginBottom: 18 }}>
-          촬영을 시작하려면 아래 버튼을 눌러주세요.
+          Press the button below to start shooting.
         </p>
 
         <Link
@@ -21,7 +21,7 @@ export default function Home() {
             textDecoration: "none",
           }}
         >
-          촬영하러 가기 →
+          Go to shooting →
         </Link>
       </div>
     </main>

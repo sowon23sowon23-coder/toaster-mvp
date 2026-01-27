@@ -135,7 +135,7 @@ export default function ResultPage() {
       try {
         const data = (await get(DB_KEY)) as SavedState | undefined;
         if (!data || !data.shots || data.shots.length !== 4) {
-          setError("촬영 데이터가 없어요. 먼저 촬영 페이지에서 4장을 찍어주세요.");
+          setError("No shooting data found. Please take 4 photos on the shooting page first.");
           setShots([]);
           setFinalBlob(null);
           setLoadedAt(null);
@@ -201,7 +201,7 @@ export default function ResultPage() {
 
   async function saveToDB() {
     setError(null);
-    if (shots.length !== 4) return setError("촬영 4장이 필요해요.");
+    if (shots.length !== 4) return setError("4 photos are required.");
     setSaving(true);
     try {
       const payload: SavedState = {
@@ -259,7 +259,7 @@ export default function ResultPage() {
             <button style={styles.btn}>← Back to Camera</button>
           </Link>
           <button style={styles.btn} onClick={saveToDB} disabled={saving || shots.length !== 4}>
-            {saving ? "저장 중..." : "저장하기(IndexedDB)"}
+            {saving ? "Saving..." : "SAVE(IndexedDB)"}
           </button>
           <button style={styles.primaryBtn} onClick={downloadFinal} disabled={!finalBlob}>
             PNG Download
