@@ -147,8 +147,8 @@ export default function CapturePage() {
     <main style={styles.page}>
       <header style={styles.header}>
         <div>
-          <h1 style={styles.h1}>shooting</h1>
-          <p style={styles.sub}>Automatic shooting after a 3-second countdown for each photo (4 photos total)</p>
+          <h1 style={styles.h1}>Photo Booth</h1>
+          <p style={styles.sub}>Automatic snapshot after a 3-second countdown for each photo (4 photos total)</p>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {!cameraOn ? (
@@ -185,7 +185,7 @@ export default function CapturePage() {
               </div>
             )}
             {isShooting && countdown === 0 && (
-              <div style={styles.shootingHint}>Shooting… ({shotIndex}/4)</div>
+              <div style={styles.shootingHint}>Capturing… ({shotIndex}/4)</div>
             )}
           </div>
           <div style={{ display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
