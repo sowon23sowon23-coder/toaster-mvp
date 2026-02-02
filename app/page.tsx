@@ -8,7 +8,7 @@ export default function Home() {
           Yogurtland Photo
         </h1>
         <p style={{ opacity: 0.7, marginBottom: 18 }}>
-          Press the button below to start shooting.
+          Press the button below to start capturing.
         </p>
 
         <Link
@@ -21,7 +21,7 @@ export default function Home() {
             textDecoration: "none",
           }}
         >
-          Go to shooting →
+          Go to Photo Booth →
         </Link>
       </div>
     </main>
