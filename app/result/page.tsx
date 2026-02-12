@@ -135,7 +135,7 @@ export default function ResultPage() {
       try {
         const data = (await get(DB_KEY)) as SavedState | undefined;
         if (!data || !data.shots || data.shots.length !== 4) {
-          setError("No shooting data found. Please take 4 photos on the shooting page first.");
+          setError("No capturing data found. Please take 4 photos on the capturing page first.");
           setShots([]);
           setFinalBlob(null);
           setLoadedAt(null);
