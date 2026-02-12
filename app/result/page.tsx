@@ -32,31 +32,9 @@ const DEFAULT_SLOTS: SlotRect[] = [
 
 const FRAMES: FrameConfig[] = [
   { id: "frame1", label: "Frame 1", src: "/frames/frame1.png" },
-  {
-    id: "frame2",
-    label: "Frame 2",
-    src: "/frames/frame2.png",
-    // Detected from frame2.png black windows (1200x1800).
-    slots: [
-      { x: 0.105, y: 0.3261, w: 0.3675, h: 0.2433 },
-      { x: 0.5142, y: 0.3261, w: 0.3683, h: 0.2433 },
-      { x: 0.105, y: 0.5783, w: 0.3675, h: 0.2428 },
-      { x: 0.5142, y: 0.5783, w: 0.3683, h: 0.2428 },
-    ],
-  },
+  { id: "frame2", label: "Frame 2", src: "/frames/frame2.png" },
   { id: "frame3", label: "Frame 3", src: "/frames/frame3.png" },
-  {
-    id: "frame4",
-    label: "Frame 4",
-    src: "/frames/frame4.png",
-    // Tuned to the custom artwork's 4 windows.
-    slots: [
-      { x: 0.1016, y: 0.3242, w: 0.3721, h: 0.2474 },
-      { x: 0.5107, y: 0.3242, w: 0.3721, h: 0.2474 },
-      { x: 0.1016, y: 0.5762, w: 0.3721, h: 0.2474 },
-      { x: 0.5107, y: 0.5762, w: 0.3721, h: 0.2474 },
-    ],
-  },
+  { id: "frame4", label: "Frame 4", src: "/frames/frame4.png" },
 ];
 
 async function loadImage(src: string): Promise<HTMLImageElement> {
