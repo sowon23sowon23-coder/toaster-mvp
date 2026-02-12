@@ -32,7 +32,18 @@ const DEFAULT_SLOTS: SlotRect[] = [
 
 const FRAMES: FrameConfig[] = [
   { id: "frame1", label: "Frame 1", src: "/frames/frame1.png" },
-  { id: "frame2", label: "Frame 2", src: "/frames/frame2.png" },
+  {
+    id: "frame2",
+    label: "Frame 2",
+    src: "/frames/frame2.png",
+    // Detected from frame2.png black windows (1200x1800).
+    slots: [
+      { x: 0.105, y: 0.3261, w: 0.3675, h: 0.2433 },
+      { x: 0.5142, y: 0.3261, w: 0.3683, h: 0.2433 },
+      { x: 0.105, y: 0.5783, w: 0.3675, h: 0.2428 },
+      { x: 0.5142, y: 0.5783, w: 0.3683, h: 0.2428 },
+    ],
+  },
   { id: "frame3", label: "Frame 3", src: "/frames/frame3.png" },
   {
     id: "frame4",
@@ -160,13 +171,10 @@ export default function ResultPage() {
         setFrameId(data.frameId ?? "frame1");
         setLoadedAt(data.savedAt ?? null);
 
-        // if cached final exists use it, else compute
-        if (data.final) setFinalBlob(data.final);
-        else {
-          const selected = getFrameConfig(data.frameId ?? "frame1");
-          const final = await composeFinalPNG(data.shots, selected);
-          setFinalBlob(final);
-        }
+        // Always recompute on load so updated frame images/slot coords are reflected.
+        const selected = getFrameConfig(data.frameId ?? "frame1");
+        const final = await composeFinalPNG(data.shots, selected);
+        setFinalBlob(final);
       } catch (e: any) {
         setError(e?.message ?? "Load failed");
       } finally {
