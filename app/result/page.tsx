@@ -15,11 +15,37 @@ type SavedState = {
 
 const DB_KEY = "toaster_mvp_state_v1";
 
-const FRAMES: { id: FrameId; label: string; src: string }[] = [
+type SlotRect = { x: number; y: number; w: number; h: number };
+type FrameConfig = {
+  id: FrameId;
+  label: string;
+  src: string;
+  slots?: SlotRect[]; // normalized 0..1 values against 1200x1800 output
+};
+
+const DEFAULT_SLOTS: SlotRect[] = [
+  { x: 0.075, y: 0.2, w: 0.425, h: 0.2833333333 },
+  { x: 0.5, y: 0.2, w: 0.425, h: 0.2833333333 },
+  { x: 0.075, y: 0.5166666667, w: 0.425, h: 0.2833333333 },
+  { x: 0.5, y: 0.5166666667, w: 0.425, h: 0.2833333333 },
+];
+
+const FRAMES: FrameConfig[] = [
   { id: "frame1", label: "Frame 1", src: "/frames/frame1.png" },
   { id: "frame2", label: "Frame 2", src: "/frames/frame2.png" },
   { id: "frame3", label: "Frame 3", src: "/frames/frame3.png" },
-  { id: "frame4", label: "Frame 4", src: "/frames/frame4.png" },
+  {
+    id: "frame4",
+    label: "Frame 4",
+    src: "/frames/frame4.png",
+    // Tuned to the custom artwork's 4 windows.
+    slots: [
+      { x: 0.1016, y: 0.3242, w: 0.3721, h: 0.2474 },
+      { x: 0.5107, y: 0.3242, w: 0.3721, h: 0.2474 },
+      { x: 0.1016, y: 0.5762, w: 0.3721, h: 0.2474 },
+      { x: 0.5107, y: 0.5762, w: 0.3721, h: 0.2474 },
+    ],
+  },
 ];
 
 async function loadImage(src: string): Promise<HTMLImageElement> {
@@ -41,29 +67,21 @@ async function blobToImage(blob: Blob): Promise<HTMLImageElement> {
   }
 }
 
-async function composeFinalPNG(shots: Blob[], frameSrc: string): Promise<Blob> {
+function getFrameConfig(frameId: FrameId): FrameConfig {
+  return FRAMES.find((f) => f.id === frameId) ?? FRAMES[0];
+}
+
+async function composeFinalPNG(shots: Blob[], frame: FrameConfig): Promise<Blob> {
   if (shots.length !== 4) throw new Error("Need exactly 4 shots");
 
   const W = 1200;
   const H = 1800;
-
-  const padding = 90;
-  const gap = 60;
-
-  const gridW = W - padding * 2;
-  const cellW = Math.floor((gridW - gap) / 2);
-  const cellH = cellW;
-  const totalGridH = cellH * 2 + gap;
-
-  const startX = padding;
-  const startY = Math.floor((H - totalGridH) / 2);
-
-  const positions = [
-    { x: startX, y: startY },
-    { x: startX + cellW + gap, y: startY },
-    { x: startX, y: startY + cellH + gap },
-    { x: startX + cellW + gap, y: startY + cellH + gap },
-  ];
+  const slots = (frame.slots ?? DEFAULT_SLOTS).map((slot) => ({
+    x: Math.round(slot.x * W),
+    y: Math.round(slot.y * H),
+    w: Math.round(slot.w * W),
+    h: Math.round(slot.h * H),
+  }));
 
   const canvas = document.createElement("canvas");
   canvas.width = W;
@@ -76,26 +94,26 @@ async function composeFinalPNG(shots: Blob[], frameSrc: string): Promise<Blob> {
 
   const shotImgs = await Promise.all(shots.map(blobToImage));
   shotImgs.forEach((img, i) => {
-    const { x, y } = positions[i];
-    const scale = Math.max(cellW / img.width, cellH / img.height);
+    const { x, y, w, h } = slots[i];
+    const scale = Math.max(w / img.width, h / img.height);
     const drawW = img.width * scale;
     const drawH = img.height * scale;
-    const dx = x + (cellW - drawW) / 2;
-    const dy = y + (cellH - drawH) / 2;
+    const dx = x + (w - drawW) / 2;
+    const dy = y + (h - drawH) / 2;
 
     ctx.save();
     ctx.beginPath();
-    ctx.rect(x, y, cellW, cellH);
+    ctx.rect(x, y, w, h);
     ctx.clip();
     ctx.drawImage(img, dx, dy, drawW, drawH);
     ctx.restore();
 
     ctx.strokeStyle = "rgba(0,0,0,0.08)";
     ctx.lineWidth = 6;
-    ctx.strokeRect(x, y, cellW, cellH);
+    ctx.strokeRect(x, y, w, h);
   });
 
-  const frameImg = await loadImage(frameSrc);
+  const frameImg = await loadImage(frame.src);
   ctx.drawImage(frameImg, 0, 0, W, H);
 
   const blob: Blob = await new Promise((resolve, reject) => {
@@ -116,10 +134,7 @@ export default function ResultPage() {
   const [shotUrls, setShotUrls] = useState<string[]>([]);
 
   const [frameId, setFrameId] = useState<FrameId>("frame1");
-  const frameSrc = useMemo(
-    () => FRAMES.find((f) => f.id === frameId)?.src ?? FRAMES[0].src,
-    [frameId]
-  );
+  const frame = useMemo(() => getFrameConfig(frameId), [frameId]);
 
   const [finalBlob, setFinalBlob] = useState<Blob | null>(null);
   const [finalUrl, setFinalUrl] = useState<string | null>(null);
@@ -148,7 +163,8 @@ export default function ResultPage() {
         // if cached final exists use it, else compute
         if (data.final) setFinalBlob(data.final);
         else {
-          const final = await composeFinalPNG(data.shots, FRAMES.find(f => f.id === (data.frameId ?? "frame1"))?.src ?? FRAMES[0].src);
+          const selected = getFrameConfig(data.frameId ?? "frame1");
+          const final = await composeFinalPNG(data.shots, selected);
           setFinalBlob(final);
         }
       } catch (e: any) {
@@ -180,7 +196,7 @@ export default function ResultPage() {
     (async () => {
       if (shots.length !== 4) return;
       try {
-        const final = await composeFinalPNG(shots, frameSrc);
+        const final = await composeFinalPNG(shots, frame);
         setFinalBlob(final);
 
         // also persist chosen frame (and cached final) to DB
