@@ -13,6 +13,8 @@ type SavedState = {
   savedAt: number;
 };
 const DB_KEY = "toaster_mvp_state_v1";
+const GAME_BACKGROUNDS = ["/game-bg/game-bg-1.jpg", "/game-bg/game-bg-2.jpg"] as const;
+
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
@@ -49,6 +51,12 @@ export default function CapturePage() {
   const [shotIndex, setShotIndex] = useState<number>(0); // 0~4
   const [shots, setShots] = useState<Blob[]>([]);
   const [shotUrls, setShotUrls] = useState<string[]>([]);
+  const [gameBackground, setGameBackground] = useState<string>(GAME_BACKGROUNDS[0]);
+
+  useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * GAME_BACKGROUNDS.length);
+    setGameBackground(GAME_BACKGROUNDS[randomIndex]);
+  }, []);
   useEffect(() => {
     return () => {
       stopCamera();
@@ -144,7 +152,14 @@ export default function CapturePage() {
   }
   const canGoNext = shots.length === 4 && !isShooting;
   return (
-    <main style={styles.page}>
+    <main
+      style={{
+        ...styles.page,
+        backgroundImage: `url(${gameBackground})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <header style={styles.header}>
         <div>
           <h1 style={styles.h1}>Photo Booth</h1>
