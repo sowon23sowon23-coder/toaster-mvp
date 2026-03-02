@@ -66,14 +66,22 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
   ctx.fillRect(0, 0, width, height);
 
   const layout = {
-    left: Math.round(84 * scaleX),
-    top: Math.round(88 * scaleY),
+    side: Math.round(84 * scaleX),
+    top: Math.round(92 * scaleY),
     gap: Math.round(22 * scaleY),
-    bottom: Math.round(210 * scaleY),
+    bottom: Math.round(192 * scaleY),
   };
 
-  const photoWidth = width - layout.left * 2;
-  const photoHeight = Math.floor((height - layout.top - layout.bottom - layout.gap * 3) / 4);
+  const targetAspect = 4 / 3;
+  const availableHeight = height - layout.top - layout.bottom - layout.gap * 3;
+  let photoHeight = Math.floor(availableHeight / 4);
+  let photoWidth = Math.round(photoHeight * targetAspect);
+  const maxPhotoWidth = width - layout.side * 2;
+  if (photoWidth > maxPhotoWidth) {
+    photoWidth = maxPhotoWidth;
+    photoHeight = Math.round(photoWidth / targetAspect);
+  }
+  const photoLeft = Math.round((width - photoWidth) / 2);
 
   ctx.filter = options.filter.canvasFilter;
   for (let i = 0; i < 4; i += 1) {
@@ -81,26 +89,26 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
     const y = layout.top + i * (photoHeight + layout.gap);
 
     ctx.fillStyle = "#f4f0ea";
-    ctx.fillRect(layout.left, y, photoWidth, photoHeight);
+    ctx.fillRect(photoLeft, y, photoWidth, photoHeight);
 
     if (photo) {
       try {
         const image = await loadImageFromBlob(photo);
         ctx.save();
         ctx.beginPath();
-        ctx.rect(layout.left, y, photoWidth, photoHeight);
+        ctx.rect(photoLeft, y, photoWidth, photoHeight);
         ctx.clip();
-        drawCover(ctx, image, layout.left, y, photoWidth, photoHeight);
+        drawCover(ctx, image, photoLeft, y, photoWidth, photoHeight);
         ctx.restore();
       } catch {
         ctx.fillStyle = "#DDD";
-        ctx.fillRect(layout.left, y, photoWidth, photoHeight);
+        ctx.fillRect(photoLeft, y, photoWidth, photoHeight);
       }
     }
 
     ctx.strokeStyle = "rgba(0,0,0,0.08)";
     ctx.lineWidth = Math.max(2, Math.round(3 * scaleX));
-    ctx.strokeRect(layout.left, y, photoWidth, photoHeight);
+    ctx.strokeRect(photoLeft, y, photoWidth, photoHeight);
   }
   ctx.filter = "none";
 
