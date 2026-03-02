@@ -13,7 +13,6 @@ type SavedState = {
 };
 
 const DB_KEY = "toaster_mvp_state_v1";
-const GAME_BACKGROUNDS = ["/game-bg/game-bg-1.jpg", "/game-bg/game-bg-2.jpg"] as const;
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -52,12 +51,6 @@ export default function CapturePage() {
   const [shotIndex, setShotIndex] = useState(0);
   const [shots, setShots] = useState<Blob[]>([]);
   const [shotUrls, setShotUrls] = useState<string[]>([]);
-  const [gameBackground, setGameBackground] = useState<string>(GAME_BACKGROUNDS[0]);
-
-  useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * GAME_BACKGROUNDS.length);
-    setGameBackground(GAME_BACKGROUNDS[randomIndex]);
-  }, []);
 
   useEffect(() => {
     return () => {
@@ -160,7 +153,7 @@ export default function CapturePage() {
   const canGoNext = shots.length === 4 && !isShooting;
 
   return (
-    <main className="capture-page" style={{ backgroundImage: `url(${gameBackground})` }}>
+    <main className="capture-page">
       <div className="capture-overlay">
         <section className="app-shell stack">
           <header className="capture-top stack">
