@@ -65,50 +65,41 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
   ctx.fillStyle = options.template.background;
   ctx.fillRect(0, 0, width, height);
 
-  const layout = {
-    side: Math.round(84 * scaleX),
+  // Match slot geometry to frame overlay placeholders to avoid visual overlap.
+  const slot = {
     top: Math.round(92 * scaleY),
+    width: Math.round(355 * scaleX),
+    height: Math.round(266 * scaleY),
     gap: Math.round(22 * scaleY),
-    bottom: Math.round(192 * scaleY),
   };
-
-  const targetAspect = 4 / 3;
-  const availableHeight = height - layout.top - layout.bottom - layout.gap * 3;
-  let photoHeight = Math.floor(availableHeight / 4);
-  let photoWidth = Math.round(photoHeight * targetAspect);
-  const maxPhotoWidth = width - layout.side * 2;
-  if (photoWidth > maxPhotoWidth) {
-    photoWidth = maxPhotoWidth;
-    photoHeight = Math.round(photoWidth / targetAspect);
-  }
-  const photoLeft = Math.round((width - photoWidth) / 2);
+  const photoLeft = Math.round((width - slot.width) / 2);
 
   ctx.filter = options.filter.canvasFilter;
   for (let i = 0; i < 4; i += 1) {
     const photo = options.photos[i];
-    const y = layout.top + i * (photoHeight + layout.gap);
+    const y = slot.top + i * (slot.height + slot.gap);
 
     ctx.fillStyle = "#f4f0ea";
-    ctx.fillRect(photoLeft, y, photoWidth, photoHeight);
+    ctx.fillRect(photoLeft, y, slot.width, slot.height);
 
     if (photo) {
       try {
         const image = await loadImageFromBlob(photo);
         ctx.save();
         ctx.beginPath();
-        ctx.rect(photoLeft, y, photoWidth, photoHeight);
+        ctx.rect(photoLeft, y, slot.width, slot.height);
         ctx.clip();
-        drawCover(ctx, image, photoLeft, y, photoWidth, photoHeight);
+        drawCover(ctx, image, photoLeft, y, slot.width, slot.height);
         ctx.restore();
       } catch {
         ctx.fillStyle = "#DDD";
-        ctx.fillRect(photoLeft, y, photoWidth, photoHeight);
+        ctx.fillRect(photoLeft, y, slot.width, slot.height);
       }
     }
 
     ctx.strokeStyle = "rgba(0,0,0,0.08)";
     ctx.lineWidth = Math.max(2, Math.round(3 * scaleX));
-    ctx.strokeRect(photoLeft, y, photoWidth, photoHeight);
+    ctx.strokeRect(photoLeft, y, slot.width, slot.height);
   }
   ctx.filter = "none";
 
