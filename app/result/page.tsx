@@ -236,15 +236,23 @@ export default function ResultPage() {
       <section className="app-shell stack">
         <header className="stack">
           <div>
+            <p className="brand-kicker">STEP 2. PICK A FRAME, SAVE THE FUN</p>
             <h1 className="app-title">Frame & Result</h1>
-            <p className="app-subtitle">Choose a frame, then save or download your image.</p>
+            <p className="app-subtitle">
+              Choose your favorite style frame, then save or download your final photobooth cut.
+            </p>
+          </div>
+          <div className="chip-row">
+            <span className="chip">Frame Select</span>
+            <span className="chip">Instant Compose</span>
+            <span className="chip">PNG Export</span>
           </div>
           <div className="controls-grid">
             <Link href="/capture" className="btn">
-              Back to Camera
+              Back to Capture
             </Link>
             <button className="btn" onClick={saveToDB} disabled={saving || shots.length !== 4}>
-              {saving ? "Saving..." : "Save"}
+              {saving ? "Saving..." : "Save Session"}
             </button>
             <button className="btn btn-primary" onClick={downloadFinal} disabled={!finalBlob}>
               Download PNG
@@ -259,7 +267,7 @@ export default function ResultPage() {
 
         <section className="result-grid">
           <article className="surface result-card stack">
-            <strong>Select Frame</strong>
+            <strong>Pick Your Frame</strong>
             <div className="frame-scroll">
               {FRAMES.map((f) => (
                 <button
@@ -278,7 +286,7 @@ export default function ResultPage() {
               ))}
             </div>
 
-            <strong>Captured Shots</strong>
+            <strong>Your 4 Shots</strong>
             <div className="preview-grid">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="shot-box">
@@ -295,12 +303,12 @@ export default function ResultPage() {
             <p className="muted-note">
               {loadedAt
                 ? `Last saved: ${new Date(loadedAt).toLocaleString()}`
-                : "No saved data yet."}
+                : "No saved session yet."}
             </p>
           </article>
 
           <article className="surface result-card stack">
-            <strong>Final Preview</strong>
+            <strong>Final Sweet Cut</strong>
             <div className="final-wrap">
               {loading ? (
                 <div className="empty-state">Loading...</div>
@@ -309,11 +317,11 @@ export default function ResultPage() {
                 <img src={finalUrl} alt="final output" />
               ) : (
                 <div className="empty-state">
-                  No final result yet. Capture photos first, then return here.
+                  No final output yet. Capture 4 photos first, then come back here.
                 </div>
               )}
             </div>
-            <p className="muted-note">Recommended frame size: 1200x1800 PNG with transparency.</p>
+            <p className="muted-note">Output size: 1200x1800 PNG. Great for sharing or printing.</p>
           </article>
         </section>
       </section>

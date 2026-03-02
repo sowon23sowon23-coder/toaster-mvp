@@ -165,10 +165,17 @@ export default function CapturePage() {
         <section className="app-shell stack">
           <header className="capture-top stack">
             <div>
+              <p className="brand-kicker">STEP 1. SNAP YOUR SWEET MOMENT</p>
               <h1 className="app-title">Photo Capture</h1>
               <p className="app-subtitle">
-                3-second countdown, automatic 4 shots. Best on mobile portrait mode.
+                3-second countdown and auto 4-shot capture. Keep your face centered for best
+                results.
               </p>
+            </div>
+            <div className="chip-row">
+              <span className="chip">Auto Countdown</span>
+              <span className="chip">4 Shot Burst</span>
+              <span className="chip">Mobile First</span>
             </div>
           </header>
 
@@ -217,7 +224,7 @@ export default function CapturePage() {
             </button>
 
             <div className="stack">
-              <strong>Preview</strong>
+              <strong>Shot Preview</strong>
               <div className="preview-grid">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="shot-box">
@@ -242,7 +249,7 @@ export default function CapturePage() {
             </Link>
 
             <p className="muted-note">
-              The next step activates after all 4 shots are captured.
+              Step 2 unlocks automatically after all 4 shots are captured.
             </p>
           </article>
         </section>
