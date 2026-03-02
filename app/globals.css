@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  --mobile-max: 430px;
   --bg: #fff4e8;
   --bg-soft: #fffaf4;
   --card: #fffefb;
@@ -42,9 +43,9 @@ a {
 }
 
 .app-shell {
-  width: min(100%, 980px);
+  width: min(100%, var(--mobile-max));
   margin: 0 auto;
-  padding: 16px;
+  padding: 14px 12px 18px;
 }
 
 .stack {
@@ -139,8 +140,8 @@ a {
 }
 
 .home-card {
-  width: min(100%, 620px);
-  padding: 28px;
+  width: 100%;
+  padding: 22px 18px;
   position: relative;
   overflow: hidden;
 }
@@ -211,7 +212,7 @@ a {
 }
 
 .capture-card {
-  padding: 14px;
+  padding: 12px;
 }
 
 .video-wrap {
@@ -274,7 +275,7 @@ a {
 
 .controls-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 8px;
 }
 
@@ -325,7 +326,7 @@ a {
 }
 
 .result-card {
-  padding: 14px;
+  padding: 12px;
 }
 
 .frame-scroll {
@@ -402,12 +403,21 @@ a {
 }
 
 @media (min-width: 720px) {
+  .app-shell {
+    width: min(100%, 520px);
+    padding: 18px 14px 24px;
+  }
+
+  .controls-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .preview-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .result-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
 
   .frame-scroll {
@@ -417,12 +427,13 @@ a {
   }
 }
 
-@media (min-width: 860px) {
+@media (min-width: 1080px) {
   .app-shell {
+    width: min(100%, 980px);
     padding: 22px;
   }
 
-  .video-wrap {
-    aspect-ratio: 16 / 9;
+  .result-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }
