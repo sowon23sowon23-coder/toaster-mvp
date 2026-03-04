@@ -83,16 +83,16 @@ export default function Capture() {
           className="capture-back-btn"
           type="button"
           onClick={() => navigate("/")}
-          aria-label="뒤로"
+          aria-label="Back"
         >
           ←
         </button>
 
         <span className="capture-header-title">
-          {isCapturing ? `촬영 중 ${captureIndex}/4` : "4컷 촬영"}
+          {isCapturing ? `Shot ${captureIndex}/4` : "Take 4 Photos"}
         </span>
 
-        <div className="capture-progress-dots" aria-label={`${captureIndex}장 촬영됨`}>
+        <div className="capture-progress-dots" aria-label={`${captureIndex} of 4 captured`}>
           {[0, 1, 2, 3].map((i) => (
             <div
               key={i}
@@ -112,7 +112,7 @@ export default function Capture() {
           <div className="capture-mask">
             <div className="capture-mask-text">
               <span className="capture-mask-icon">📷</span>
-              <p className="capture-mask-label">카메라 권한을 허용해주세요</p>
+              <p className="capture-mask-label">Allow camera access to continue</p>
             </div>
           </div>
         )}
@@ -127,7 +127,7 @@ export default function Capture() {
           <div className="capture-alert">
             <p style={{ marginBottom: 8, fontSize: "0.85rem" }}>{permissionError}</p>
             <Button variant="secondary" onClick={() => void requestCamera()}>
-              다시 시도
+              Retry
             </Button>
           </div>
         )}
@@ -143,13 +143,13 @@ export default function Capture() {
           }}
           disabled={isCapturing}
         >
-          다시 찍기
+          Retake
         </Button>
         <Button
           onClick={() => void runCaptureSequence()}
           disabled={!cameraReady || isCapturing}
         >
-          {isCapturing ? "촬영 중..." : "촬영 시작 →"}
+          {isCapturing ? "Capturing..." : "Start Shoot →"}
         </Button>
       </div>
     </main>

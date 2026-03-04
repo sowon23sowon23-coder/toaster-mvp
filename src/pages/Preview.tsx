@@ -127,13 +127,13 @@ export default function Preview() {
           className="page-header-back"
           type="button"
           onClick={() => navigate("/edit")}
-          aria-label="뒤로"
+          aria-label="Back"
         >
           ←
         </button>
         <div className="page-header-text">
           <div className="page-header-title">Preview & Share</div>
-          <div className="page-header-sub">완성된 4컷을 저장하세요</div>
+          <div className="page-header-sub">Save your finished 4-cut</div>
         </div>
       </div>
 
@@ -141,9 +141,9 @@ export default function Preview() {
       <div className="preview-image-wrap">
         <div className="preview-image-shell">
           {previewUrl ? (
-            <img src={previewUrl} alt="완성된 4컷 사진" />
+            <img src={previewUrl} alt="Final 4-cut preview" />
           ) : (
-            <p className="preview-rendering-text">렌더링 중... ✨</p>
+            <p className="preview-rendering-text">Rendering... ✨</p>
           )}
         </div>
       </div>
@@ -152,7 +152,7 @@ export default function Preview() {
       <div className="preview-content-scroll">
         <div className="panel caption-card">
           <label className="caption-label" htmlFor="caption">
-            📝 캡션
+            📝 Caption
           </label>
           <textarea
             id="caption"
@@ -166,7 +166,7 @@ export default function Preview() {
             type="button"
             onClick={() => void handleCopyCaption()}
           >
-            {copied ? "✓ 복사됨!" : "📋 캡션 복사"}
+            {copied ? "✓ Copied!" : "📋 Copy Caption"}
           </button>
         </div>
       </div>
@@ -174,7 +174,7 @@ export default function Preview() {
       {/* Fixed bottom CTA */}
       <div className="preview-bottom-cta">
         <Button onClick={() => void handleDownload()} disabled={working}>
-          {working ? "렌더링 중..." : "⬇ PNG 저장 (1080×1350)"}
+          {working ? "Rendering..." : "⬇ Save PNG (1080×1350)"}
         </Button>
       </div>
     </main>

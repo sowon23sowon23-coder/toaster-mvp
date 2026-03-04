@@ -101,13 +101,13 @@ export default function Edit() {
           className="page-header-back"
           type="button"
           onClick={() => navigate("/capture")}
-          aria-label="뒤로"
+          aria-label="Back"
         >
           ←
         </button>
         <div className="page-header-text">
           <div className="page-header-title">Edit Your Booth</div>
-          <div className="page-header-sub">필터 · 스티커 · 텍스트</div>
+          <div className="page-header-sub">Filter · Sticker · Text</div>
         </div>
       </div>
 
@@ -143,7 +143,7 @@ export default function Edit() {
           {/* Filter Panel */}
           {activeTab === "filter" && (
             <section className="panel edit-panel">
-              <p className="edit-panel-hint">탭하여 필터를 적용하세요</p>
+              <p className="edit-panel-hint">Tap to apply a filter</p>
               <div className="filter-grid">
                 {FILTERS.map((item) => {
                   const isActive = item.id === selectedFilterId;
@@ -170,7 +170,7 @@ export default function Edit() {
           {/* Sticker Panel */}
           {activeTab === "sticker" && (
             <section className="panel edit-panel">
-              <p className="edit-panel-hint">스티커를 탭해서 추가하세요</p>
+              <p className="edit-panel-hint">Tap a sticker to add it</p>
               <div className="sticker-grid">
                 {STICKER_ASSETS.map((src) => (
                   <button key={src} className="sticker-thumb-v2" type="button" onClick={() => addSticker(src)}>
@@ -181,13 +181,13 @@ export default function Edit() {
               {selectedSticker && (
                 <div className="sticker-editor">
                   <div className="sticker-editor-header">
-                    <span className="sticker-editor-title">스티커 편집</span>
+                    <span className="sticker-editor-title">Edit Sticker</span>
                     <button
                       className="sticker-delete-btn"
                       type="button"
                       onClick={() => { removeSticker(selectedSticker.id); setSelectedStickerId(null); }}
                     >
-                      🗑 삭제
+                      🗑 Delete
                     </button>
                   </div>
                   <div className="scale-row">
@@ -224,7 +224,7 @@ export default function Edit() {
                 />
                 <span className="char-counter">{textLine.length}/30</span>
               </div>
-              <p className="edit-panel-hint" style={{ marginTop: 12 }}>폰트 선택</p>
+              <p className="edit-panel-hint" style={{ marginTop: 12 }}>Choose a font</p>
               <div className="font-grid">
                 {FONTS.map((item) => {
                   const isActive = item.id === textFont;

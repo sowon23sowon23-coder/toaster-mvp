@@ -24,7 +24,7 @@ export default function Landing() {
 
         <h1 className="landing-title">Sweet Moment{"\n"}Photo Booth</h1>
         <p className="landing-sub">
-          나만의 요거트랜드 4컷을 만들고<br />인스타그램에 공유해요 🍦
+          Create your Yogurtland 4-cut photo<br />and share it on Instagram 🍦
         </p>
 
         <div className="landing-steps">
@@ -46,7 +46,7 @@ export default function Landing() {
       </div>
 
       <div className="landing-cta">
-        <Button onClick={handleStart}>시작하기 →</Button>
+        <Button onClick={handleStart}>Start Campaign →</Button>
       </div>
     </main>
   );
