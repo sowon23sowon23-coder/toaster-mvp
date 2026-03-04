@@ -8,25 +8,45 @@ export default function Landing() {
   const resetPhotos = usePhotoboothStore((state) => state.resetPhotos);
   const resetEdit = usePhotoboothStore((state) => state.resetEdit);
 
-  return (
-    <main className="screen">
-      <section className="panel landing-panel">
-        <img className="brand-logo" src="/brand/logo_placeholder.png" alt="Yogurtland campaign logo" />
-        <h1>Sweet Moment Photo Booth</h1>
-        <p>Create your Yogurtland 4-cut and share it on Instagram.</p>
-      </section>
+  function handleStart() {
+    trackEvent("start_clicked");
+    resetPhotos();
+    resetEdit();
+    navigate("/capture");
+  }
 
-      <div className="bottom-cta">
-        <Button
-          onClick={() => {
-            trackEvent("start_clicked");
-            resetPhotos();
-            resetEdit();
-            navigate("/capture");
-          }}
-        >
-          Start Campaign
-        </Button>
+  return (
+    <main className="landing-page">
+      <div className="landing-hero">
+        <div className="landing-logo-wrap">
+          <img src="/brand/logo_placeholder.png" alt="Yogurtland" />
+        </div>
+
+        <h1 className="landing-title">Sweet Moment{"\n"}Photo Booth</h1>
+        <p className="landing-sub">
+          나만의 요거트랜드 4컷을 만들고<br />인스타그램에 공유해요 🍦
+        </p>
+
+        <div className="landing-steps">
+          <div className="step-item">
+            <span className="step-icon">📸</span>
+            <span className="step-label">Capture</span>
+          </div>
+          <span className="step-arrow">›</span>
+          <div className="step-item">
+            <span className="step-icon">✨</span>
+            <span className="step-label">Edit</span>
+          </div>
+          <span className="step-arrow">›</span>
+          <div className="step-item">
+            <span className="step-icon">📤</span>
+            <span className="step-label">Share</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="landing-cta">
+        <Button onClick={handleStart}>시작하기 →</Button>
       </div>
     </main>
   );

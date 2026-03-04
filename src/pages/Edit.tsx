@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import Header from "../components/Header";
-import Tabs from "../components/Tabs";
 import StickerCanvasOverlay from "../components/StickerCanvasOverlay";
 import Button from "../components/Button";
 import { FILTERS, FONTS, STICKER_ASSETS, TEMPLATES } from "../lib/assets";
@@ -9,6 +7,20 @@ import { renderPhotoboothImage } from "../lib/canvasRender";
 import { usePhotoboothStore } from "../store/usePhotoboothStore";
 
 type EditTab = "filter" | "sticker" | "text";
+
+const FILTER_SWATCHES: Record<string, string> = {
+  none: "linear-gradient(135deg, #f9c6d4, #fde8c0, #c8eafd)",
+  soft: "linear-gradient(135deg, #fde8d8, #fce4e9, #fdf0e0)",
+  vivid: "linear-gradient(135deg, #f472b6, #fb923c, #a78bfa)",
+  cool: "linear-gradient(135deg, #86efac, #67e8f9, #818cf8)",
+  mono: "linear-gradient(135deg, #d1d5db, #9ca3af, #6b7280)",
+};
+
+const TAB_ICONS: Record<EditTab, string> = {
+  filter: "🎨",
+  sticker: "✨",
+  text: "✍️",
+};
 
 export default function Edit() {
   const navigate = useNavigate();
@@ -83,104 +95,160 @@ export default function Edit() {
   if (photos.length !== 4) return <Navigate to="/capture" replace />;
 
   return (
-    <main className="screen">
-      <Header title="Edit Your Booth" subtitle="Filter, stickers, and one-line text." backTo="/capture" />
+    <main className="edit-screen">
+      <div className="page-header">
+        <button
+          className="page-header-back"
+          type="button"
+          onClick={() => navigate("/capture")}
+          aria-label="뒤로"
+        >
+          ←
+        </button>
+        <div className="page-header-text">
+          <div className="page-header-title">Edit Your Booth</div>
+          <div className="page-header-sub">필터 · 스티커 · 텍스트</div>
+        </div>
+      </div>
 
-      <StickerCanvasOverlay
-        previewSrc={previewUrl}
-        stickers={stickers}
-        selectedStickerId={selectedStickerId}
-        onSelectSticker={setSelectedStickerId}
-        onMoveSticker={moveSticker}
-      />
+      <div className="edit-preview-wrap">
+        <StickerCanvasOverlay
+          previewSrc={previewUrl}
+          stickers={stickers}
+          selectedStickerId={selectedStickerId}
+          onSelectSticker={setSelectedStickerId}
+          onMoveSticker={moveSticker}
+        />
+      </div>
 
-      <Tabs
-        value={activeTab}
-        onChange={setActiveTab}
-        options={[
-          { id: "filter", label: "Filter" },
-          { id: "sticker", label: "Sticker" },
-          { id: "text", label: "Text" },
-        ]}
-      />
+      <div className="edit-controls">
+        {/* Tab Bar */}
+        <div className="edit-tab-bar" role="tablist">
+          {(["filter", "sticker", "text"] as EditTab[]).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === tab}
+              className={`edit-tab-btn${activeTab === tab ? " active" : ""}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              <span className="edit-tab-icon">{TAB_ICONS[tab]}</span>
+              <span className="edit-tab-label">{tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
+            </button>
+          ))}
+        </div>
 
-      {activeTab === "filter" && (
-        <section className="panel control-panel">
-          <div className="chip-grid">
-            {FILTERS.map((item) => (
-              <button
-                key={item.id}
-                className={`chip-btn${item.id === selectedFilterId ? " active" : ""}`}
-                type="button"
-                onClick={() => setFilter(item.id)}
-              >
-                {item.name}
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {activeTab === "sticker" && (
-        <section className="panel control-panel">
-          <div className="sticker-picker">
-            {STICKER_ASSETS.map((src) => (
-              <button key={src} className="sticker-thumb" type="button" onClick={() => addSticker(src)}>
-                <img src={src} alt="sticker option" />
-              </button>
-            ))}
-          </div>
-          {selectedSticker && (
-            <div className="sticker-controls">
-              <label htmlFor="scale">Scale</label>
-              <input
-                id="scale"
-                type="range"
-                min={0.08}
-                max={0.42}
-                step={0.01}
-                value={selectedSticker.scale}
-                onChange={(event) => scaleSticker(selectedSticker.id, Number(event.target.value))}
-              />
-              <Button variant="danger" onClick={() => removeSticker(selectedSticker.id)}>
-                Delete Sticker
-              </Button>
-            </div>
+        <div className="edit-panel-scroll">
+          {/* Filter Panel */}
+          {activeTab === "filter" && (
+            <section className="panel edit-panel">
+              <p className="edit-panel-hint">탭하여 필터를 적용하세요</p>
+              <div className="filter-grid">
+                {FILTERS.map((item) => {
+                  const isActive = item.id === selectedFilterId;
+                  return (
+                    <button
+                      key={item.id}
+                      className={`filter-card${isActive ? " active" : ""}`}
+                      type="button"
+                      onClick={() => setFilter(item.id)}
+                    >
+                      <div
+                        className="filter-swatch"
+                        style={{ background: FILTER_SWATCHES[item.id] }}
+                      />
+                      <span className="filter-name">{item.name}</span>
+                      {isActive && <span className="filter-check">✓</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
           )}
-        </section>
-      )}
 
-      {activeTab === "text" && (
-        <section className="panel control-panel">
-          <label className="field-label" htmlFor="lineText">
-            Caption Text (max 30 chars)
-          </label>
-          <input
-            id="lineText"
-            maxLength={30}
-            value={textLine}
-            onChange={(event) => setTextLine(event.target.value)}
-            placeholder="Sweet moment!"
-            className="text-input"
-          />
-          <div className="chip-grid">
-            {FONTS.map((item) => (
-              <button
-                key={item.id}
-                className={`chip-btn${item.id === textFont ? " active" : ""}`}
-                onClick={() => setTextFont(item.id)}
-                type="button"
-                style={{ fontFamily: item.cssFamily }}
-              >
-                {item.name}
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
+          {/* Sticker Panel */}
+          {activeTab === "sticker" && (
+            <section className="panel edit-panel">
+              <p className="edit-panel-hint">스티커를 탭해서 추가하세요</p>
+              <div className="sticker-grid">
+                {STICKER_ASSETS.map((src) => (
+                  <button key={src} className="sticker-thumb-v2" type="button" onClick={() => addSticker(src)}>
+                    <img src={src} alt="sticker" />
+                  </button>
+                ))}
+              </div>
+              {selectedSticker && (
+                <div className="sticker-editor">
+                  <div className="sticker-editor-header">
+                    <span className="sticker-editor-title">스티커 편집</span>
+                    <button
+                      className="sticker-delete-btn"
+                      type="button"
+                      onClick={() => { removeSticker(selectedSticker.id); setSelectedStickerId(null); }}
+                    >
+                      🗑 삭제
+                    </button>
+                  </div>
+                  <div className="scale-row">
+                    <span className="scale-icon">🔍</span>
+                    <input
+                      id="scale"
+                      type="range"
+                      className="scale-slider"
+                      min={0.08}
+                      max={0.42}
+                      step={0.01}
+                      value={selectedSticker.scale}
+                      onChange={(event) => scaleSticker(selectedSticker.id, Number(event.target.value))}
+                    />
+                    <span className="scale-icon">🔎</span>
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
 
-      <div className="bottom-cta">
-        <Button onClick={() => navigate("/preview")}>Next: Preview</Button>
+          {/* Text Panel */}
+          {activeTab === "text" && (
+            <section className="panel edit-panel">
+              <div className="text-input-wrapper">
+                <input
+                  id="lineText"
+                  maxLength={30}
+                  value={textLine}
+                  onChange={(event) => setTextLine(event.target.value)}
+                  placeholder="Sweet moment! 🍦"
+                  className="text-input-v2"
+                  style={{ fontFamily: font.cssFamily }}
+                />
+                <span className="char-counter">{textLine.length}/30</span>
+              </div>
+              <p className="edit-panel-hint" style={{ marginTop: 12 }}>폰트 선택</p>
+              <div className="font-grid">
+                {FONTS.map((item) => {
+                  const isActive = item.id === textFont;
+                  return (
+                    <button
+                      key={item.id}
+                      className={`font-card${isActive ? " active" : ""}`}
+                      onClick={() => setTextFont(item.id)}
+                      type="button"
+                      style={{ fontFamily: item.cssFamily }}
+                    >
+                      <span className="font-preview">Aa</span>
+                      <span className="font-name">{item.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+        </div>{/* edit-panel-scroll */}
+      </div>{/* edit-controls */}
+
+      <div className="edit-bottom-cta">
+        <Button onClick={() => navigate("/preview")}>Next: Preview →</Button>
       </div>
     </main>
   );

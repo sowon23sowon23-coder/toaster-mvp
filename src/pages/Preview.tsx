@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Navigate } from "react-router-dom";
-import Header from "../components/Header";
+import { Navigate, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import { FILTERS, FONTS, TEMPLATES } from "../lib/assets";
 import { buildDownloadName, renderPhotoboothImage } from "../lib/canvasRender";
@@ -12,7 +11,6 @@ async function copyText(value: string) {
     await navigator.clipboard.writeText(value);
     return;
   }
-
   const temp = document.createElement("textarea");
   temp.value = value;
   temp.setAttribute("readonly", "true");
@@ -25,8 +23,10 @@ async function copyText(value: string) {
 }
 
 export default function Preview() {
+  const navigate = useNavigate();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const selectedTemplateId = usePhotoboothStore((state) => state.selectedTemplateId);
   const photos = usePhotoboothStore((state) => state.photos);
@@ -73,15 +73,11 @@ export default function Preview() {
       });
     })();
 
-    return () => {
-      canceled = true;
-    };
+    return () => { canceled = true; };
   }, [template, photos, filter, stickers, textLine, font]);
 
   useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
+    return () => { if (previewUrl) URL.revokeObjectURL(previewUrl); };
   }, [previewUrl]);
 
   if (photos.length !== 4) return <Navigate to="/capture" replace />;
@@ -119,35 +115,66 @@ export default function Preview() {
   async function handleCopyCaption() {
     await copyText(caption);
     trackEvent("caption_copied");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   return (
-    <main className="screen">
-      <Header title="Preview & Share" subtitle="Instagram feed style preview and caption tools." backTo="/edit" />
+    <main className="preview-page">
+      {/* Header */}
+      <div className="page-header">
+        <button
+          className="page-header-back"
+          type="button"
+          onClick={() => navigate("/edit")}
+          aria-label="뒤로"
+        >
+          ←
+        </button>
+        <div className="page-header-text">
+          <div className="page-header-title">Preview & Share</div>
+          <div className="page-header-sub">완성된 4컷을 저장하세요</div>
+        </div>
+      </div>
 
-      <section className="panel preview-panel">
-        <div className="ig-shell">{previewUrl ? <img src={previewUrl} alt="final preview" /> : <p>Rendering...</p>}</div>
-      </section>
+      {/* Preview image */}
+      <div className="preview-image-wrap">
+        <div className="preview-image-shell">
+          {previewUrl ? (
+            <img src={previewUrl} alt="완성된 4컷 사진" />
+          ) : (
+            <p className="preview-rendering-text">렌더링 중... ✨</p>
+          )}
+        </div>
+      </div>
 
-      <section className="panel">
-        <label className="field-label" htmlFor="caption">
-          Caption
-        </label>
-        <textarea
-          id="caption"
-          className="caption-box"
-          value={caption}
-          onChange={(event) => setCaption(event.target.value)}
-          rows={4}
-        />
-        <Button variant="secondary" onClick={() => void handleCopyCaption()}>
-          Copy Caption
-        </Button>
-      </section>
+      {/* Scrollable content: caption */}
+      <div className="preview-content-scroll">
+        <div className="panel caption-card">
+          <label className="caption-label" htmlFor="caption">
+            📝 캡션
+          </label>
+          <textarea
+            id="caption"
+            className="caption-textarea"
+            value={caption}
+            onChange={(event) => setCaption(event.target.value)}
+            rows={4}
+          />
+          <button
+            className="caption-copy-btn"
+            type="button"
+            onClick={() => void handleCopyCaption()}
+          >
+            {copied ? "✓ 복사됨!" : "📋 캡션 복사"}
+          </button>
+        </div>
+      </div>
 
-      <div className="bottom-cta">
+      {/* Fixed bottom CTA */}
+      <div className="preview-bottom-cta">
         <Button onClick={() => void handleDownload()} disabled={working}>
-          {working ? "Rendering PNG..." : "Download PNG (1080x1350)"}
+          {working ? "렌더링 중..." : "⬇ PNG 저장 (1080×1350)"}
         </Button>
       </div>
     </main>

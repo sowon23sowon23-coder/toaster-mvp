@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
 import Button from "../components/Button";
 import { captureVideoFrame, startPreferredCamera, stopCamera } from "../lib/camera";
 import { usePhotoboothStore } from "../store/usePhotoboothStore";
@@ -77,28 +76,65 @@ export default function Capture() {
   }
 
   return (
-    <main className="screen">
-      <Header title="Capture 4 Photos" subtitle="3-second countdown for each shot." backTo="/" />
+    <main className="capture-page">
+      {/* Header */}
+      <div className="capture-header">
+        <button
+          className="capture-back-btn"
+          type="button"
+          onClick={() => navigate("/")}
+          aria-label="뒤로"
+        >
+          ←
+        </button>
 
-      {permissionError && (
-        <div className="alert">
-          <p>{permissionError}</p>
-          <Button variant="secondary" onClick={() => void requestCamera()}>
-            Retry Camera Permission
-          </Button>
+        <span className="capture-header-title">
+          {isCapturing ? `촬영 중 ${captureIndex}/4` : "4컷 촬영"}
+        </span>
+
+        <div className="capture-progress-dots" aria-label={`${captureIndex}장 촬영됨`}>
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className={`capture-dot${
+                i < captureIndex ? " done" : i === captureIndex && isCapturing ? " current" : ""
+              }`}
+            />
+          ))}
         </div>
-      )}
+      </div>
 
-      <section className="panel camera-panel">
-        <div className="camera-view">
-          <video ref={videoRef} autoPlay muted playsInline />
-          {!cameraReady && <div className="camera-mask">Turn on camera permission to continue.</div>}
-          {countdown > 0 && <div className="countdown">{countdown}</div>}
-        </div>
-        <p className="progress-label">Progress: {captureIndex}/4</p>
-      </section>
+      {/* Camera */}
+      <div className="capture-camera-wrap">
+        <video ref={videoRef} autoPlay muted playsInline />
 
-      <div className="bottom-cta stack-row">
+        {!cameraReady && !permissionError && (
+          <div className="capture-mask">
+            <div className="capture-mask-text">
+              <span className="capture-mask-icon">📷</span>
+              <p className="capture-mask-label">카메라 권한을 허용해주세요</p>
+            </div>
+          </div>
+        )}
+
+        {countdown > 0 && (
+          <div className="countdown-overlay">
+            <span key={countdown} className="countdown-number">{countdown}</span>
+          </div>
+        )}
+
+        {permissionError && (
+          <div className="capture-alert">
+            <p style={{ marginBottom: 8, fontSize: "0.85rem" }}>{permissionError}</p>
+            <Button variant="secondary" onClick={() => void requestCamera()}>
+              다시 시도
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Actions */}
+      <div className="capture-actions">
         <Button
           variant="secondary"
           onClick={() => {
@@ -107,10 +143,13 @@ export default function Capture() {
           }}
           disabled={isCapturing}
         >
-          Retake
+          다시 찍기
         </Button>
-        <Button onClick={() => void runCaptureSequence()} disabled={!cameraReady || isCapturing}>
-          {isCapturing ? "Capturing..." : "Start 4-Shot Countdown"}
+        <Button
+          onClick={() => void runCaptureSequence()}
+          disabled={!cameraReady || isCapturing}
+        >
+          {isCapturing ? "촬영 중..." : "촬영 시작 →"}
         </Button>
       </div>
     </main>
