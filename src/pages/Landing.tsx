@@ -1,9 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import { trackEvent } from "../lib/analytics";
+import { usePhotoboothStore } from "../store/usePhotoboothStore";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const resetPhotos = usePhotoboothStore((state) => state.resetPhotos);
+  const resetEdit = usePhotoboothStore((state) => state.resetEdit);
 
   return (
     <main className="screen">
@@ -17,7 +20,9 @@ export default function Landing() {
         <Button
           onClick={() => {
             trackEvent("start_clicked");
-            navigate("/templates");
+            resetPhotos();
+            resetEdit();
+            navigate("/capture");
           }}
         >
           Start Campaign

@@ -31,7 +31,7 @@ export default function Edit() {
   const setTextFont = usePhotoboothStore((state) => state.setTextFont);
 
   const template = useMemo(
-    () => TEMPLATES.find((item) => item.id === selectedTemplateId) ?? null,
+    () => TEMPLATES.find((item) => item.id === selectedTemplateId) ?? TEMPLATES[0],
     [selectedTemplateId],
   );
   const filter = useMemo(
@@ -45,7 +45,7 @@ export default function Edit() {
   );
 
   useEffect(() => {
-    if (!template || photos.length !== 4) return;
+    if (photos.length !== 4) return;
 
     let canceled = false;
     void (async () => {
@@ -80,7 +80,6 @@ export default function Edit() {
     };
   }, [previewUrl]);
 
-  if (!template) return <Navigate to="/templates" replace />;
   if (photos.length !== 4) return <Navigate to="/capture" replace />;
 
   return (

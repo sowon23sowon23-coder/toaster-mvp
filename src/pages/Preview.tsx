@@ -38,7 +38,7 @@ export default function Preview() {
   const setCaption = usePhotoboothStore((state) => state.setCaption);
 
   const template = useMemo(
-    () => TEMPLATES.find((item) => item.id === selectedTemplateId) ?? null,
+    () => TEMPLATES.find((item) => item.id === selectedTemplateId) ?? TEMPLATES[0],
     [selectedTemplateId],
   );
   const filter = useMemo(
@@ -48,7 +48,7 @@ export default function Preview() {
   const font = useMemo(() => FONTS.find((item) => item.id === textFont) ?? FONTS[0], [textFont]);
 
   useEffect(() => {
-    if (!template || photos.length !== 4) return;
+    if (photos.length !== 4) return;
     let canceled = false;
 
     void (async () => {
@@ -84,11 +84,9 @@ export default function Preview() {
     };
   }, [previewUrl]);
 
-  if (!template) return <Navigate to="/templates" replace />;
   if (photos.length !== 4) return <Navigate to="/capture" replace />;
 
   async function handleDownload() {
-    if (!template) return;
     setWorking(true);
     try {
       const blob = await renderPhotoboothImage({

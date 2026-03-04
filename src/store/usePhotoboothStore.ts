@@ -34,7 +34,7 @@ type PhotoboothState = {
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
 export const usePhotoboothStore = create<PhotoboothState>((set) => ({
-  selectedTemplateId: null,
+  selectedTemplateId: "signature",
   photos: [],
   selectedFilterId: "none",
   stickers: [],

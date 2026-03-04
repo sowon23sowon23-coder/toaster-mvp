@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Button from "../components/Button";
 import { captureVideoFrame, startPreferredCamera, stopCamera } from "../lib/camera";
@@ -10,7 +10,6 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function Capture() {
   const navigate = useNavigate();
-  const selectedTemplateId = usePhotoboothStore((state) => state.selectedTemplateId);
   const setPhotos = usePhotoboothStore((state) => state.setPhotos);
   const resetPhotos = usePhotoboothStore((state) => state.resetPhotos);
 
@@ -27,8 +26,6 @@ export default function Capture() {
     void requestCamera();
     return () => stopCamera(streamRef.current);
   }, []);
-
-  if (!selectedTemplateId) return <Navigate to="/templates" replace />;
 
   async function requestCamera() {
     setPermissionError(null);
@@ -81,7 +78,7 @@ export default function Capture() {
 
   return (
     <main className="screen">
-      <Header title="Capture 4 Photos" subtitle="3-second countdown for each shot." backTo="/templates" />
+      <Header title="Capture 4 Photos" subtitle="3-second countdown for each shot." backTo="/" />
 
       {permissionError && (
         <div className="alert">
