@@ -145,8 +145,6 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
       panelHeight,
       Math.round(layout.panelRadius * scaleX),
     );
-    ctx.fillStyle = layout.panelFill;
-    ctx.fill();
     ctx.lineWidth = Math.max(4, Math.round(layout.panelBorderWidth * scaleX));
     ctx.strokeStyle = layout.panelBorder;
     ctx.stroke();

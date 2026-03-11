@@ -28,7 +28,7 @@ export const TEMPLATES: TemplateConfig[] = [
     name: "Signature Cream",
     description: "Warm and creamy look with a classic signature mood.",
     frameSrc: "/frames/signature.png",
-    background: "#FFF7EE",
+    background: "#FFFFFF",
   },
   {
     id: "sprinkle",
