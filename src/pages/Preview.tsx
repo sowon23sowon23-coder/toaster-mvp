@@ -10,6 +10,10 @@ const isIosDevice = () =>
   /iPad|iPhone|iPod/.test(navigator.userAgent)
   || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
+const isMobileDevice = () =>
+  /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+  || navigator.maxTouchPoints > 1;
+
 type SaveFilePickerWindow = Window & {
   showSaveFilePicker?: (options?: {
     suggestedName?: string;
@@ -108,7 +112,10 @@ export default function Preview() {
       const file = new File([blob], filename, { type: "image/png" });
       const pickerWindow = window as SaveFilePickerWindow;
 
-      if (pickerWindow.showSaveFilePicker) {
+      if (isMobileDevice() && navigator.canShare?.({ files: [file] }) && navigator.share) {
+        await navigator.share({ files: [file], title: filename });
+        setSaveMessage("Use the share menu to save to Photos or Gallery.");
+      } else if (pickerWindow.showSaveFilePicker) {
         const handle = await pickerWindow.showSaveFilePicker({
           suggestedName: filename,
           types: [
