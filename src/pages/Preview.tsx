@@ -30,6 +30,7 @@ type SaveFilePickerWindow = Window & {
 export default function Preview() {
   const navigate = useNavigate();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [fullResBlob, setFullResBlob] = useState<Blob | null>(null);
   const [working, setWorking] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
@@ -53,9 +54,11 @@ export default function Preview() {
   useEffect(() => {
     if (photos.length !== 4) return;
     let canceled = false;
+    setFullResBlob(null);
 
     void (async () => {
-      const blob = await renderPhotoboothImage({
+      // 프리뷰 렌더링
+      const previewBlob = await renderPhotoboothImage({
         photos,
         template,
         filter,
@@ -69,11 +72,28 @@ export default function Preview() {
       });
 
       if (canceled) return;
-      const url = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(previewBlob);
       setPreviewUrl((prev) => {
         if (prev) URL.revokeObjectURL(prev);
         return url;
       });
+
+      // 고해상도 미리 렌더링 (클릭 즉시 다운로드 가능하도록)
+      const highResBlob = await renderPhotoboothImage({
+        photos,
+        template,
+        filter,
+        stickers,
+        textLine,
+        textFont: font,
+        frameSrc: template.frameSrc,
+        watermarkSrc: "/brand/yogurtland_mark.png",
+        width: 1080,
+        height: 1350,
+      });
+
+      if (canceled) return;
+      setFullResBlob(highResBlob);
     })();
 
     return () => {
@@ -93,7 +113,8 @@ export default function Preview() {
     setWorking(true);
     setSaveMessage(null);
     try {
-      const blob = await renderPhotoboothImage({
+      // 미리 렌더된 고해상도 blob 사용, 없으면 즉시 렌더링
+      const blob = fullResBlob ?? await renderPhotoboothImage({
         photos,
         template,
         filter,
@@ -173,6 +194,9 @@ export default function Preview() {
       }
 
       trackEvent("download_clicked");
+    } catch (err) {
+      setSaveMessage("저장에 실패했습니다. 다시 시도해 주세요.");
+      console.error("Download failed:", err);
     } finally {
       setWorking(false);
     }
@@ -206,8 +230,8 @@ export default function Preview() {
       </div>
 
       <div className="preview-bottom-cta">
-        <Button onClick={() => void handleDownload()} disabled={working}>
-          {working ? "Rendering..." : "Save PNG (1080x1350)"}
+        <Button onClick={() => void handleDownload()} disabled={working || !fullResBlob}>
+          {working ? "Saving..." : !fullResBlob ? "Preparing..." : "Save PNG (1080x1350)"}
         </Button>
         {saveMessage && <p className="preview-save-message">{saveMessage}</p>}
       </div>
