@@ -2,6 +2,7 @@ export type AnalyticsEvent =
   | "start_clicked"
   | "template_selected"
   | "capture_completed"
+  | "capture_skipped"
   | "download_clicked"
   | "caption_copied";
 

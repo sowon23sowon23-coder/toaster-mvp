@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap");
+
 /* ============================================================
    DESIGN TOKENS
    ============================================================ */
@@ -16,6 +18,7 @@
   --r-sm: 10px;
   --shadow-card: 0 8px 24px rgba(100, 40, 80, 0.10);
   --shadow-btn: 0 4px 14px rgba(230, 60, 131, 0.32);
+  --font-brand: "Montserrat", "Avenir Next", "Segoe UI", sans-serif;
 }
 
 /* ============================================================
@@ -193,6 +196,7 @@ body {
   margin: 0 auto;
   min-height: 100dvh;
   padding: 0 14px;
+  font-family: var(--font-brand);
 }
 
 .landing-hero {
@@ -207,29 +211,24 @@ body {
 }
 
 .landing-logo-wrap {
-  width: 120px;
-  height: 120px;
-  border-radius: 32px;
-  background: linear-gradient(135deg, #fff5f9, #fff0fb);
-  border: 1.5px solid var(--line);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 24px;
-  box-shadow: 0 8px 28px rgba(230, 60, 131, 0.14);
 }
 
 .landing-logo-wrap img {
-  width: 80px;
+  width: min(220px, 62vw);
   height: auto;
   display: block;
 }
 
 .landing-title {
   font-size: 1.7rem;
-  font-weight: 900;
+  font-family: var(--font-brand);
+  font-weight: 800;
   line-height: 1.2;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.04em;
   background: linear-gradient(135deg, #e63c83, #9b27af);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -241,6 +240,8 @@ body {
   font-size: 0.92rem;
   color: var(--muted);
   line-height: 1.6;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   margin-bottom: 32px;
 }
 
@@ -269,21 +270,27 @@ body {
 
 .step-label {
   font-size: 0.68rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--muted);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
 }
 
 .step-arrow {
   font-size: 0.85rem;
   color: var(--primary);
-  font-weight: 700;
+  font-weight: 800;
   flex-shrink: 0;
 }
 
 .landing-cta {
   padding: 16px 0 calc(20px + env(safe-area-inset-bottom));
   flex-shrink: 0;
+}
+
+.landing-page .btn {
+  font-family: var(--font-brand);
+  font-weight: 800;
+  letter-spacing: 0.01em;
 }
 
 /* ============================================================
@@ -437,7 +444,7 @@ body {
 .capture-actions {
   flex-shrink: 0;
   display: grid;
-  grid-template-columns: 1fr 1.8fr;
+  grid-template-columns: 1fr 1fr 1.6fr;
   gap: 10px;
   padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
   background: #0d0a10;

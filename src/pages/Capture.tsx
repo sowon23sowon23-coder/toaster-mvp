@@ -6,6 +6,7 @@ import { usePhotoboothStore } from "../store/usePhotoboothStore";
 import { trackEvent } from "../lib/analytics";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const SKIPPED_PHOTOS = Array.from({ length: 4 }, () => new Blob([], { type: "image/png" }));
 
 export default function Capture() {
   const navigate = useNavigate();
@@ -73,6 +74,16 @@ export default function Capture() {
       setCountdown(0);
       setIsCapturing(false);
     }
+  }
+
+  function handleSkipShoot() {
+    if (isCapturing) return;
+    stopCamera(streamRef.current);
+    streamRef.current = null;
+    resetPhotos();
+    setPhotos(SKIPPED_PHOTOS);
+    trackEvent("capture_skipped");
+    navigate("/edit");
   }
 
   return (
@@ -144,6 +155,13 @@ export default function Capture() {
           disabled={isCapturing}
         >
           Retake
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={handleSkipShoot}
+          disabled={isCapturing}
+        >
+          Skip
         </Button>
         <Button
           onClick={() => void runCaptureSequence()}
