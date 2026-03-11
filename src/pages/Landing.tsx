@@ -19,7 +19,7 @@ export default function Landing() {
     <main className="landing-page">
       <div className="landing-hero">
         <div className="landing-logo-wrap">
-          <img src="/brand/logo_placeholder.png" alt="Yogurtland" />
+          <img src="/brand/yogurtland_mark.png" alt="Yogurtland" />
         </div>
 
         <h1 className="landing-title">Sweet Moment{"\n"}Photo Booth</h1>
