@@ -218,7 +218,7 @@ body {
 }
 
 .landing-logo-wrap img {
-  width: min(220px, 62vw);
+  width: min(320px, 84vw);
   height: auto;
   display: block;
 }
