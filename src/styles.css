@@ -873,11 +873,6 @@ body {
   z-index: 10;
 }
 
-.preview-action-stack {
-  display: grid;
-  gap: 8px;
-}
-
 .preview-save-message {
   margin-top: 8px;
   text-align: center;

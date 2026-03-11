@@ -10,9 +10,7 @@ const isIosDevice = () =>
   /iPad|iPhone|iPod/.test(navigator.userAgent)
   || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-const isMobileDevice = () =>
-  /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-  || navigator.maxTouchPoints > 1;
+const isAndroidDevice = () => /Android/i.test(navigator.userAgent);
 
 type SaveFilePickerWindow = Window & {
   showSaveFilePicker?: (options?: {
@@ -33,7 +31,6 @@ export default function Preview() {
   const navigate = useNavigate();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
-  const [opening, setOpening] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
   const selectedTemplateId = usePhotoboothStore((state) => state.selectedTemplateId);
@@ -92,59 +89,27 @@ export default function Preview() {
 
   if (photos.length !== 4) return <Navigate to="/capture" replace />;
 
-  async function renderFinalBlob() {
-    return renderPhotoboothImage({
-      photos,
-      template,
-      filter,
-      stickers,
-      textLine,
-      textFont: font,
-      frameSrc: template.frameSrc,
-      watermarkSrc: "/brand/yogurtland_mark.png",
-      width: 1080,
-      height: 1350,
-    });
-  }
-
-  function openBlobInNewTab(blob: Blob) {
-    const url = URL.createObjectURL(blob);
-    const popup = window.open(url, "_blank", "noopener,noreferrer");
-    if (!popup) {
-      window.location.href = url;
-    }
-    setSaveMessage("Opened image in a new tab. Long-press it and save to Gallery.");
-    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
-  }
-
-  async function handleOpenImage() {
-    setOpening(true);
-    setSaveMessage(null);
-    try {
-      const blob = await renderFinalBlob();
-      openBlobInNewTab(blob);
-    } finally {
-      setOpening(false);
-    }
-  }
-
   async function handleDownload() {
     setWorking(true);
     setSaveMessage(null);
     try {
-      const blob = await renderFinalBlob();
+      const blob = await renderPhotoboothImage({
+        photos,
+        template,
+        filter,
+        stickers,
+        textLine,
+        textFont: font,
+        frameSrc: template.frameSrc,
+        watermarkSrc: "/brand/yogurtland_mark.png",
+        width: 1080,
+        height: 1350,
+      });
+
       const filename = buildDownloadName();
-      const file = new File([blob], filename, { type: "image/png" });
       const pickerWindow = window as SaveFilePickerWindow;
 
-      if (isMobileDevice() && navigator.canShare?.({ files: [file] }) && navigator.share) {
-        try {
-          await navigator.share({ files: [file], title: filename });
-          setSaveMessage("Use the share menu to save to Photos or Gallery.");
-        } catch {
-          openBlobInNewTab(blob);
-        }
-      } else if (pickerWindow.showSaveFilePicker) {
+      if (pickerWindow.showSaveFilePicker) {
         const handle = await pickerWindow.showSaveFilePicker({
           suggestedName: filename,
           types: [
@@ -158,12 +123,36 @@ export default function Preview() {
         await writable.write(blob);
         await writable.close();
         setSaveMessage("Saved to your device.");
-      } else if (navigator.canShare?.({ files: [file] }) && navigator.share) {
-        try {
-          await navigator.share({ files: [file], title: filename });
-          setSaveMessage("Share sheet opened. Choose Save Image or Files.");
-        } catch {
-          openBlobInNewTab(blob);
+      } else if (isAndroidDevice()) {
+        const file = new File([blob], filename, { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file], title: filename });
+            setSaveMessage("이미지를 갤러리에 저장하세요.");
+          } catch (err) {
+            if ((err as DOMException).name !== "AbortError") {
+              // 공유가 취소되지 않은 경우 anchor 다운로드로 폴백
+              const url = URL.createObjectURL(blob);
+              const anchor = document.createElement("a");
+              anchor.href = url;
+              anchor.download = filename;
+              document.body.appendChild(anchor);
+              anchor.click();
+              anchor.remove();
+              setSaveMessage("다운로드가 시작되었습니다. 갤러리 앱에서 확인하세요.");
+              window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
+            }
+          }
+        } else {
+          const url = URL.createObjectURL(blob);
+          const anchor = document.createElement("a");
+          anchor.href = url;
+          anchor.download = filename;
+          document.body.appendChild(anchor);
+          anchor.click();
+          anchor.remove();
+          setSaveMessage("다운로드가 시작되었습니다. 갤러리 앱에서 확인하세요.");
+          window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
         }
       } else {
         const url = URL.createObjectURL(blob);
@@ -175,15 +164,8 @@ export default function Preview() {
         anchor.remove();
 
         if (isIosDevice()) {
-          const popup = window.open(url, "_blank", "noopener,noreferrer");
-          if (!popup) {
-            window.location.href = url;
-          }
-          setSaveMessage("Opened image in a new tab. Long-press the image to save it.");
+          setSaveMessage("iPhone may block direct downloads. If nothing downloads, open in Safari and use Share > Save to Photos.");
           window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
-        } else if (isMobileDevice()) {
-          URL.revokeObjectURL(url);
-          openBlobInNewTab(blob);
         } else {
           setSaveMessage("Download started.");
           window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
@@ -224,14 +206,9 @@ export default function Preview() {
       </div>
 
       <div className="preview-bottom-cta">
-        <div className="preview-action-stack">
-          <Button onClick={() => void handleDownload()} disabled={working || opening}>
-            {working ? "Rendering..." : "Save PNG (1080x1350)"}
-          </Button>
-          <Button variant="secondary" onClick={() => void handleOpenImage()} disabled={working || opening}>
-            {opening ? "Opening..." : "Open Image"}
-          </Button>
-        </div>
+        <Button onClick={() => void handleDownload()} disabled={working}>
+          {working ? "Rendering..." : "Save PNG (1080x1350)"}
+        </Button>
         {saveMessage && <p className="preview-save-message">{saveMessage}</p>}
       </div>
     </main>
