@@ -61,11 +61,8 @@ export const FONTS: FontConfig[] = [
 ];
 
 export const STICKER_ASSETS = [
-  ...Array.from({ length: 12 }, (_, i) => {
-    const value = String(i + 1).padStart(2, "0");
-    return `/stickers/sticker-${value}.png`;
-  }),
   "/pineapple.png",
+  ...Array.from({ length: 6 }, (_, i) => `/sticker${i + 1}.png`),
 ];
 
 export const DEFAULT_CAPTION = `Sweet moments in every cut
