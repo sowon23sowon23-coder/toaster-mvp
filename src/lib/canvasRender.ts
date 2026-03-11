@@ -15,6 +15,9 @@ type RenderOptions = {
 };
 
 type TemplateLayout = {
+  backdropInsetX: number;
+  backdropInsetY: number;
+  backdropRadius: number;
   panelInsetX: number;
   panelInsetY: number;
   panelRadius: number;
@@ -32,6 +35,9 @@ type TemplateLayout = {
 function getTemplateLayout(templateId: string): TemplateLayout {
   if (templateId === "signature") {
     return {
+      backdropInsetX: 150,
+      backdropInsetY: 6,
+      backdropRadius: 56,
       panelInsetX: 270,
       panelInsetY: 10,
       panelRadius: 44,
@@ -48,6 +54,9 @@ function getTemplateLayout(templateId: string): TemplateLayout {
   }
 
   return {
+    backdropInsetX: 0,
+    backdropInsetY: 0,
+    backdropRadius: 0,
     panelInsetX: 0,
     panelInsetY: 0,
     panelRadius: 0,
@@ -129,10 +138,27 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
   const scaleY = height / 1350;
   const layout = getTemplateLayout(options.template.id);
 
-  ctx.fillStyle = options.template.background;
-  ctx.fillRect(0, 0, width, height);
+  if (options.template.id !== "signature") {
+    ctx.fillStyle = options.template.background;
+    ctx.fillRect(0, 0, width, height);
+  }
 
   if (options.template.id === "signature") {
+    const backdropX = Math.round(layout.backdropInsetX * scaleX);
+    const backdropY = Math.round(layout.backdropInsetY * scaleY);
+    const backdropWidth = width - backdropX * 2;
+    const backdropHeight = height - backdropY * 2;
+    drawRoundedRect(
+      ctx,
+      backdropX,
+      backdropY,
+      backdropWidth,
+      backdropHeight,
+      Math.round(layout.backdropRadius * scaleX),
+    );
+    ctx.fillStyle = "#fffdfd";
+    ctx.fill();
+
     const panelX = Math.round(layout.panelInsetX * scaleX);
     const panelY = Math.round(layout.panelInsetY * scaleY);
     const panelWidth = width - panelX * 2;

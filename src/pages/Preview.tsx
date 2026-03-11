@@ -6,10 +6,15 @@ import { buildDownloadName, renderPhotoboothImage } from "../lib/canvasRender";
 import { usePhotoboothStore } from "../store/usePhotoboothStore";
 import { trackEvent } from "../lib/analytics";
 
+const isIosDevice = () =>
+  /iPad|iPhone|iPod/.test(navigator.userAgent)
+  || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
 export default function Preview() {
   const navigate = useNavigate();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
   const selectedTemplateId = usePhotoboothStore((state) => state.selectedTemplateId);
   const photos = usePhotoboothStore((state) => state.photos);
@@ -69,6 +74,7 @@ export default function Preview() {
 
   async function handleDownload() {
     setWorking(true);
+    setSaveMessage(null);
     try {
       const blob = await renderPhotoboothImage({
         photos,
@@ -83,14 +89,34 @@ export default function Preview() {
         height: 1350,
       });
 
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = buildDownloadName();
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-      URL.revokeObjectURL(url);
+      const filename = buildDownloadName();
+      const file = new File([blob], filename, { type: "image/png" });
+
+      if (navigator.canShare?.({ files: [file] }) && navigator.share) {
+        await navigator.share({ files: [file], title: filename });
+        setSaveMessage("Share sheet opened.");
+      } else {
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = filename;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+
+        if (isIosDevice()) {
+          const popup = window.open(url, "_blank", "noopener,noreferrer");
+          if (!popup) {
+            window.location.href = url;
+          }
+          setSaveMessage("Opened image in a new tab. Long-press the image to save it.");
+          window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        } else {
+          setSaveMessage("Download started.");
+          window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
+        }
+      }
+
       trackEvent("download_clicked");
     } finally {
       setWorking(false);
@@ -128,6 +154,7 @@ export default function Preview() {
         <Button onClick={() => void handleDownload()} disabled={working}>
           {working ? "Rendering..." : "Save PNG (1080x1350)"}
         </Button>
+        {saveMessage && <p className="preview-save-message">{saveMessage}</p>}
       </div>
     </main>
   );
