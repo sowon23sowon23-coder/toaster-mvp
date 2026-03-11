@@ -33,6 +33,7 @@ export default function Preview() {
   const navigate = useNavigate();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
+  const [opening, setOpening] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
   const selectedTemplateId = usePhotoboothStore((state) => state.selectedTemplateId);
@@ -91,42 +92,57 @@ export default function Preview() {
 
   if (photos.length !== 4) return <Navigate to="/capture" replace />;
 
+  async function renderFinalBlob() {
+    return renderPhotoboothImage({
+      photos,
+      template,
+      filter,
+      stickers,
+      textLine,
+      textFont: font,
+      frameSrc: template.frameSrc,
+      watermarkSrc: "/brand/yogurtland_mark.png",
+      width: 1080,
+      height: 1350,
+    });
+  }
+
+  function openBlobInNewTab(blob: Blob) {
+    const url = URL.createObjectURL(blob);
+    const popup = window.open(url, "_blank", "noopener,noreferrer");
+    if (!popup) {
+      window.location.href = url;
+    }
+    setSaveMessage("Opened image in a new tab. Long-press it and save to Gallery.");
+    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  }
+
+  async function handleOpenImage() {
+    setOpening(true);
+    setSaveMessage(null);
+    try {
+      const blob = await renderFinalBlob();
+      openBlobInNewTab(blob);
+    } finally {
+      setOpening(false);
+    }
+  }
+
   async function handleDownload() {
     setWorking(true);
     setSaveMessage(null);
     try {
-      const blob = await renderPhotoboothImage({
-        photos,
-        template,
-        filter,
-        stickers,
-        textLine,
-        textFont: font,
-        frameSrc: template.frameSrc,
-        watermarkSrc: "/brand/yogurtland_mark.png",
-        width: 1080,
-        height: 1350,
-      });
-
+      const blob = await renderFinalBlob();
       const filename = buildDownloadName();
       const file = new File([blob], filename, { type: "image/png" });
       const pickerWindow = window as SaveFilePickerWindow;
-      const openImageForManualSave = () => {
-        const url = URL.createObjectURL(blob);
-        const popup = window.open(url, "_blank", "noopener,noreferrer");
-        if (!popup) {
-          window.location.href = url;
-        }
-        setSaveMessage("Opened image in a new tab. Long-press it and save to Gallery.");
-        window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
-      };
 
       if (isMobileDevice() && navigator.canShare?.({ files: [file] }) && navigator.share) {
         try {
           await navigator.share({ files: [file], title: filename });
           setSaveMessage("Use the share menu to save to Photos or Gallery.");
         } catch {
-          openImageForManualSave();
+          openBlobInNewTab(blob);
         }
       } else if (pickerWindow.showSaveFilePicker) {
         const handle = await pickerWindow.showSaveFilePicker({
@@ -147,7 +163,7 @@ export default function Preview() {
           await navigator.share({ files: [file], title: filename });
           setSaveMessage("Share sheet opened. Choose Save Image or Files.");
         } catch {
-          openImageForManualSave();
+          openBlobInNewTab(blob);
         }
       } else {
         const url = URL.createObjectURL(blob);
@@ -167,7 +183,7 @@ export default function Preview() {
           window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
         } else if (isMobileDevice()) {
           URL.revokeObjectURL(url);
-          openImageForManualSave();
+          openBlobInNewTab(blob);
         } else {
           setSaveMessage("Download started.");
           window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
@@ -208,9 +224,14 @@ export default function Preview() {
       </div>
 
       <div className="preview-bottom-cta">
-        <Button onClick={() => void handleDownload()} disabled={working}>
-          {working ? "Rendering..." : "Save PNG (1080x1350)"}
-        </Button>
+        <div className="preview-action-stack">
+          <Button onClick={() => void handleDownload()} disabled={working || opening}>
+            {working ? "Rendering..." : "Save PNG (1080x1350)"}
+          </Button>
+          <Button variant="secondary" onClick={() => void handleOpenImage()} disabled={working || opening}>
+            {opening ? "Opening..." : "Open Image"}
+          </Button>
+        </div>
         {saveMessage && <p className="preview-save-message">{saveMessage}</p>}
       </div>
     </main>
