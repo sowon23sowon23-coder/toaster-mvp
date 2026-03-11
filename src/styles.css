@@ -480,10 +480,10 @@ body {
 
 .edit-preview-wrap .preview-stage {
   aspect-ratio: 4 / 5;
-  width: min(122px, 31vw);
+  width: min(250px, 64vw);
   height: auto;
   max-width: 100%;
-  margin: 0 auto 6px;
+  margin: 0 auto 10px;
 }
 
 .edit-controls {
