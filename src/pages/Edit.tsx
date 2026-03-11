@@ -6,7 +6,7 @@ import { FILTERS, FONTS, STICKER_ASSETS, TEMPLATES } from "../lib/assets";
 import { renderPhotoboothImage } from "../lib/canvasRender";
 import { usePhotoboothStore } from "../store/usePhotoboothStore";
 
-type EditTab = "filter" | "sticker" | "text";
+type EditTab = "filter" | "sticker";
 
 const FILTER_SWATCHES: Record<string, string> = {
   none: "linear-gradient(135deg, #f9c6d4, #fde8c0, #c8eafd)",
@@ -19,7 +19,6 @@ const FILTER_SWATCHES: Record<string, string> = {
 const TAB_ICONS: Record<EditTab, string> = {
   filter: "🎨",
   sticker: "✨",
-  text: "✍️",
 };
 
 export default function Edit() {
@@ -40,7 +39,6 @@ export default function Edit() {
   const scaleSticker = usePhotoboothStore((state) => state.scaleSticker);
   const removeSticker = usePhotoboothStore((state) => state.removeSticker);
   const setTextLine = usePhotoboothStore((state) => state.setTextLine);
-  const setTextFont = usePhotoboothStore((state) => state.setTextFont);
 
   const template = useMemo(
     () => TEMPLATES.find((item) => item.id === selectedTemplateId) ?? TEMPLATES[0],
@@ -57,6 +55,12 @@ export default function Edit() {
   );
 
   useEffect(() => {
+    if (textLine) {
+      setTextLine("");
+    }
+  }, [setTextLine, textLine]);
+
+  useEffect(() => {
     if (photos.length !== 4) return;
 
     let canceled = false;
@@ -66,7 +70,7 @@ export default function Edit() {
         template,
         filter,
         stickers,
-        textLine,
+        textLine: "",
         textFont: font,
         frameSrc: template.frameSrc,
         watermarkSrc: "/brand/yogurtland_mark.png",
@@ -84,7 +88,7 @@ export default function Edit() {
     return () => {
       canceled = true;
     };
-  }, [template, photos, filter, stickers, textLine, font]);
+  }, [template, photos, filter, stickers, font]);
 
   useEffect(() => {
     return () => {
@@ -107,7 +111,7 @@ export default function Edit() {
         </button>
         <div className="page-header-text">
           <div className="page-header-title">Edit Your Booth</div>
-          <div className="page-header-sub">Filter · Sticker · Text</div>
+          <div className="page-header-sub">Filter · Sticker</div>
         </div>
       </div>
 
@@ -122,9 +126,8 @@ export default function Edit() {
       </div>
 
       <div className="edit-controls">
-        {/* Tab Bar */}
         <div className="edit-tab-bar" role="tablist">
-          {(["filter", "sticker", "text"] as EditTab[]).map((tab) => (
+          {(["filter", "sticker"] as EditTab[]).map((tab) => (
             <button
               key={tab}
               type="button"
@@ -140,7 +143,6 @@ export default function Edit() {
         </div>
 
         <div className="edit-panel-scroll">
-          {/* Filter Panel */}
           {activeTab === "filter" && (
             <section className="panel edit-panel">
               <p className="edit-panel-hint">Tap to apply a filter</p>
@@ -154,10 +156,7 @@ export default function Edit() {
                       type="button"
                       onClick={() => setFilter(item.id)}
                     >
-                      <div
-                        className="filter-swatch"
-                        style={{ background: FILTER_SWATCHES[item.id] }}
-                      />
+                      <div className="filter-swatch" style={{ background: FILTER_SWATCHES[item.id] }} />
                       <span className="filter-name">{item.name}</span>
                       {isActive && <span className="filter-check">✓</span>}
                     </button>
@@ -167,13 +166,17 @@ export default function Edit() {
             </section>
           )}
 
-          {/* Sticker Panel */}
           {activeTab === "sticker" && (
             <section className="panel edit-panel">
               <p className="edit-panel-hint">Tap a sticker to add it</p>
               <div className="sticker-grid">
                 {STICKER_ASSETS.map((src) => (
-                  <button key={src} className="sticker-thumb-v2" type="button" onClick={() => addSticker(src)}>
+                  <button
+                    key={src}
+                    className="sticker-thumb-v2"
+                    type="button"
+                    onClick={() => addSticker(src)}
+                  >
                     <img src={src} alt="sticker" />
                   </button>
                 ))}
@@ -185,13 +188,16 @@ export default function Edit() {
                     <button
                       className="sticker-delete-btn"
                       type="button"
-                      onClick={() => { removeSticker(selectedSticker.id); setSelectedStickerId(null); }}
+                      onClick={() => {
+                        removeSticker(selectedSticker.id);
+                        setSelectedStickerId(null);
+                      }}
                     >
-                      🗑 Delete
+                      Delete
                     </button>
                   </div>
                   <div className="scale-row">
-                    <span className="scale-icon">🔍</span>
+                    <span className="scale-icon">-</span>
                     <input
                       id="scale"
                       type="range"
@@ -202,50 +208,14 @@ export default function Edit() {
                       value={selectedSticker.scale}
                       onChange={(event) => scaleSticker(selectedSticker.id, Number(event.target.value))}
                     />
-                    <span className="scale-icon">🔎</span>
+                    <span className="scale-icon">+</span>
                   </div>
                 </div>
               )}
             </section>
           )}
-
-          {/* Text Panel */}
-          {activeTab === "text" && (
-            <section className="panel edit-panel">
-              <div className="text-input-wrapper">
-                <input
-                  id="lineText"
-                  maxLength={30}
-                  value={textLine}
-                  onChange={(event) => setTextLine(event.target.value)}
-                  placeholder="Sweet moment! 🍦"
-                  className="text-input-v2"
-                  style={{ fontFamily: font.cssFamily }}
-                />
-                <span className="char-counter">{textLine.length}/30</span>
-              </div>
-              <p className="edit-panel-hint" style={{ marginTop: 12 }}>Choose a font</p>
-              <div className="font-grid">
-                {FONTS.map((item) => {
-                  const isActive = item.id === textFont;
-                  return (
-                    <button
-                      key={item.id}
-                      className={`font-card${isActive ? " active" : ""}`}
-                      onClick={() => setTextFont(item.id)}
-                      type="button"
-                      style={{ fontFamily: item.cssFamily }}
-                    >
-                      <span className="font-preview">Aa</span>
-                      <span className="font-name">{item.name}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-          )}
-        </div>{/* edit-panel-scroll */}
-      </div>{/* edit-controls */}
+        </div>
+      </div>
 
       <div className="edit-bottom-cta">
         <Button onClick={() => navigate("/preview")}>Next: Preview →</Button>
