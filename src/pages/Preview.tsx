@@ -12,8 +12,14 @@ const isIosDevice = () =>
 
 const isAndroidDevice = () => /Android/i.test(navigator.userAgent);
 
-const isRestrictedWebView = () =>
-  /KAKAOTALK|NAVER|Instagram|FB_IAB|FBAN|Line\/|MicroMessenger|DaumApps/i.test(navigator.userAgent);
+const isRestrictedWebView = () => {
+  const ua = navigator.userAgent;
+  // 알려진 인앱브라우저 UA 패턴
+  if (/KAKAOTALK|NAVER|NaverSearch|Instagram|FB_IAB|FBAN|Line\/|MicroMessenger|DaumApps|Slack|Teams|kakaotalk|twitter/i.test(ua)) return true;
+  // Android WebView 공통 신호: wv 플래그 또는 Version/x.x 없이 Chrome만 있는 경우
+  if (/Android/i.test(ua) && /wv\b/.test(ua)) return true;
+  return false;
+};
 
 type SaveFilePickerWindow = Window & {
   showSaveFilePicker?: (options?: {
