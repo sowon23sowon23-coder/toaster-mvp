@@ -14,6 +14,72 @@ type RenderOptions = {
   height?: number;
 };
 
+type TemplateLayout = {
+  panelInsetX: number;
+  panelInsetY: number;
+  panelRadius: number;
+  panelBorderWidth: number;
+  panelFill: string;
+  panelBorder: string;
+  slotTop: number;
+  slotWidth: number;
+  slotHeight: number;
+  slotGap: number;
+  watermarkWidth: number;
+  watermarkBottom: number;
+};
+
+function getTemplateLayout(templateId: string): TemplateLayout {
+  if (templateId === "signature") {
+    return {
+      panelInsetX: 18,
+      panelInsetY: 10,
+      panelRadius: 44,
+      panelBorderWidth: 14,
+      panelFill: "#E9E1D7",
+      panelBorder: "#D75A8E",
+      slotTop: 86,
+      slotWidth: 392,
+      slotHeight: 246,
+      slotGap: 22,
+      watermarkWidth: 132,
+      watermarkBottom: 34,
+    };
+  }
+
+  return {
+    panelInsetX: 0,
+    panelInsetY: 0,
+    panelRadius: 0,
+    panelBorderWidth: 0,
+    panelFill: "",
+    panelBorder: "",
+    slotTop: 92,
+    slotWidth: 355,
+    slotHeight: 266,
+    slotGap: 22,
+    watermarkWidth: 190,
+    watermarkBottom: 32,
+  };
+}
+
+function drawRoundedRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.arcTo(x + width, y, x + width, y + height, radius);
+  ctx.arcTo(x + width, y + height, x, y + height, radius);
+  ctx.arcTo(x, y + height, x, y, radius);
+  ctx.arcTo(x, y, x + width, y, radius);
+  ctx.closePath();
+}
+
 async function loadImageFromBlob(blob: Blob): Promise<HTMLImageElement> {
   const url = URL.createObjectURL(blob);
   try {
@@ -61,16 +127,36 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
 
   const scaleX = width / 1080;
   const scaleY = height / 1350;
+  const layout = getTemplateLayout(options.template.id);
 
   ctx.fillStyle = options.template.background;
   ctx.fillRect(0, 0, width, height);
 
-  // Match slot geometry to frame overlay placeholders to avoid visual overlap.
+  if (options.template.id === "signature") {
+    const panelX = Math.round(layout.panelInsetX * scaleX);
+    const panelY = Math.round(layout.panelInsetY * scaleY);
+    const panelWidth = width - panelX * 2;
+    const panelHeight = height - panelY * 2;
+    drawRoundedRect(
+      ctx,
+      panelX,
+      panelY,
+      panelWidth,
+      panelHeight,
+      Math.round(layout.panelRadius * scaleX),
+    );
+    ctx.fillStyle = layout.panelFill;
+    ctx.fill();
+    ctx.lineWidth = Math.max(4, Math.round(layout.panelBorderWidth * scaleX));
+    ctx.strokeStyle = layout.panelBorder;
+    ctx.stroke();
+  }
+
   const slot = {
-    top: Math.round(92 * scaleY),
-    width: Math.round(355 * scaleX),
-    height: Math.round(266 * scaleY),
-    gap: Math.round(22 * scaleY),
+    top: Math.round(layout.slotTop * scaleY),
+    width: Math.round(layout.slotWidth * scaleX),
+    height: Math.round(layout.slotHeight * scaleY),
+    gap: Math.round(layout.slotGap * scaleY),
   };
   const photoLeft = Math.round((width - slot.width) / 2);
 
@@ -128,21 +214,23 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
     ctx.fillText(options.textLine.trim(), width / 2, height - Math.round(128 * scaleY));
   }
 
-  try {
-    const frameImage = await loadImage(options.frameSrc);
-    ctx.drawImage(frameImage, 0, 0, width, height);
-  } catch {
-    ctx.strokeStyle = "rgba(232, 83, 137, 0.7)";
-    ctx.lineWidth = Math.round(18 * scaleX);
-    ctx.strokeRect(0, 0, width, height);
+  if (options.template.id !== "signature") {
+    try {
+      const frameImage = await loadImage(options.frameSrc);
+      ctx.drawImage(frameImage, 0, 0, width, height);
+    } catch {
+      ctx.strokeStyle = "rgba(232, 83, 137, 0.7)";
+      ctx.lineWidth = Math.round(18 * scaleX);
+      ctx.strokeRect(0, 0, width, height);
+    }
   }
 
   try {
     const watermark = await loadImage(options.watermarkSrc);
-    const watermarkWidth = Math.round(190 * scaleX);
+    const watermarkWidth = Math.round(layout.watermarkWidth * scaleX);
     const watermarkHeight = Math.round((watermark.height / watermark.width) * watermarkWidth);
     const x = Math.round((width - watermarkWidth) / 2);
-    const y = height - watermarkHeight - Math.round(32 * scaleY);
+    const y = height - watermarkHeight - Math.round(layout.watermarkBottom * scaleY);
     ctx.globalAlpha = 0.82;
     ctx.drawImage(watermark, x, y, watermarkWidth, watermarkHeight);
     ctx.globalAlpha = 1;
