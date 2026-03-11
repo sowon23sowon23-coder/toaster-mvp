@@ -10,6 +10,21 @@ const isIosDevice = () =>
   /iPad|iPhone|iPod/.test(navigator.userAgent)
   || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
+type SaveFilePickerWindow = Window & {
+  showSaveFilePicker?: (options?: {
+    suggestedName?: string;
+    types?: Array<{
+      description?: string;
+      accept: Record<string, string[]>;
+    }>;
+  }) => Promise<{
+    createWritable: () => Promise<{
+      write: (data: Blob) => Promise<void>;
+      close: () => Promise<void>;
+    }>;
+  }>;
+};
+
 export default function Preview() {
   const navigate = useNavigate();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -91,10 +106,25 @@ export default function Preview() {
 
       const filename = buildDownloadName();
       const file = new File([blob], filename, { type: "image/png" });
+      const pickerWindow = window as SaveFilePickerWindow;
 
-      if (navigator.canShare?.({ files: [file] }) && navigator.share) {
+      if (pickerWindow.showSaveFilePicker) {
+        const handle = await pickerWindow.showSaveFilePicker({
+          suggestedName: filename,
+          types: [
+            {
+              description: "PNG image",
+              accept: { "image/png": [".png"] },
+            },
+          ],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        setSaveMessage("Saved to your device.");
+      } else if (navigator.canShare?.({ files: [file] }) && navigator.share) {
         await navigator.share({ files: [file], title: filename });
-        setSaveMessage("Share sheet opened.");
+        setSaveMessage("Share sheet opened. Choose Save Image or Files.");
       } else {
         const url = URL.createObjectURL(blob);
         const anchor = document.createElement("a");
