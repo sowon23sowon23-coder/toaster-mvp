@@ -26,7 +26,7 @@ export const TEMPLATES: TemplateConfig[] = [
   {
     id: "signature",
     name: "Signature Cream",
-    description: "Warm and creamy look with classic Yogurtland mood.",
+    description: "Warm and creamy look with a classic signature mood.",
     frameSrc: "/frames/signature.png",
     background: "#FFF7EE",
   },
@@ -65,5 +65,5 @@ export const STICKER_ASSETS = Array.from({ length: 12 }, (_, i) => {
   return `/stickers/sticker-${value}.png`;
 });
 
-export const DEFAULT_CAPTION = `Sweet moments at Yogurtland 🍦
-#Yogurtland #SweetMoment #ShareTheJoy`;
+export const DEFAULT_CAPTION = `Sweet moments in every cut
+#SweetMoment #ShareTheJoy`;

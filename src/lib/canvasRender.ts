@@ -32,7 +32,7 @@ type TemplateLayout = {
 function getTemplateLayout(templateId: string): TemplateLayout {
   if (templateId === "signature") {
     return {
-      panelInsetX: 72,
+      panelInsetX: 96,
       panelInsetY: 10,
       panelRadius: 44,
       panelBorderWidth: 14,
@@ -235,11 +235,6 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
     ctx.drawImage(watermark, x, y, watermarkWidth, watermarkHeight);
     ctx.globalAlpha = 1;
   } catch {
-    ctx.globalAlpha = 0.6;
-    ctx.fillStyle = "#7a4e66";
-    ctx.font = `600 ${Math.round(24 * scaleY)}px Arial, sans-serif`;
-    ctx.textAlign = "center";
-    ctx.fillText("Yogurtland", width / 2, height - Math.round(38 * scaleY));
     ctx.globalAlpha = 1;
   }
 

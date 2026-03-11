@@ -245,6 +245,13 @@ body {
   margin-bottom: 32px;
 }
 
+.landing-sub-logo {
+  width: min(126px, 38vw);
+  height: auto;
+  vertical-align: middle;
+  transform: translateY(-1px);
+}
+
 .landing-steps {
   display: flex;
   align-items: center;
@@ -264,8 +271,10 @@ body {
 }
 
 .step-icon {
-  font-size: 1.4rem;
-  line-height: 1;
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--primary-strong);
 }
 
 .step-label {
