@@ -111,10 +111,23 @@ export default function Preview() {
       const filename = buildDownloadName();
       const file = new File([blob], filename, { type: "image/png" });
       const pickerWindow = window as SaveFilePickerWindow;
+      const openImageForManualSave = () => {
+        const url = URL.createObjectURL(blob);
+        const popup = window.open(url, "_blank", "noopener,noreferrer");
+        if (!popup) {
+          window.location.href = url;
+        }
+        setSaveMessage("Opened image in a new tab. Long-press it and save to Gallery.");
+        window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      };
 
       if (isMobileDevice() && navigator.canShare?.({ files: [file] }) && navigator.share) {
-        await navigator.share({ files: [file], title: filename });
-        setSaveMessage("Use the share menu to save to Photos or Gallery.");
+        try {
+          await navigator.share({ files: [file], title: filename });
+          setSaveMessage("Use the share menu to save to Photos or Gallery.");
+        } catch {
+          openImageForManualSave();
+        }
       } else if (pickerWindow.showSaveFilePicker) {
         const handle = await pickerWindow.showSaveFilePicker({
           suggestedName: filename,
@@ -130,8 +143,12 @@ export default function Preview() {
         await writable.close();
         setSaveMessage("Saved to your device.");
       } else if (navigator.canShare?.({ files: [file] }) && navigator.share) {
-        await navigator.share({ files: [file], title: filename });
-        setSaveMessage("Share sheet opened. Choose Save Image or Files.");
+        try {
+          await navigator.share({ files: [file], title: filename });
+          setSaveMessage("Share sheet opened. Choose Save Image or Files.");
+        } catch {
+          openImageForManualSave();
+        }
       } else {
         const url = URL.createObjectURL(blob);
         const anchor = document.createElement("a");
@@ -148,6 +165,9 @@ export default function Preview() {
           }
           setSaveMessage("Opened image in a new tab. Long-press the image to save it.");
           window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        } else if (isMobileDevice()) {
+          URL.revokeObjectURL(url);
+          openImageForManualSave();
         } else {
           setSaveMessage("Download started.");
           window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
