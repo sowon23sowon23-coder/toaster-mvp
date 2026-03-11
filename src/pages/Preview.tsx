@@ -12,6 +12,9 @@ const isIosDevice = () =>
 
 const isAndroidDevice = () => /Android/i.test(navigator.userAgent);
 
+const isRestrictedWebView = () =>
+  /KAKAOTALK|NAVER|Instagram|FB_IAB|FBAN|Line\/|MicroMessenger|DaumApps/i.test(navigator.userAgent);
+
 type SaveFilePickerWindow = Window & {
   showSaveFilePicker?: (options?: {
     suggestedName?: string;
@@ -145,35 +148,32 @@ export default function Preview() {
         await writable.close();
         setSaveMessage("Saved to your device.");
       } else if (isAndroidDevice()) {
-        const file = new File([blob], filename, { type: "image/png" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({ files: [file], title: filename });
-            setSaveMessage("이미지를 갤러리에 저장하세요.");
-          } catch (err) {
-            if ((err as DOMException).name !== "AbortError") {
-              // 공유가 취소되지 않은 경우 anchor 다운로드로 폴백
-              const url = URL.createObjectURL(blob);
-              const anchor = document.createElement("a");
-              anchor.href = url;
-              anchor.download = filename;
-              document.body.appendChild(anchor);
-              anchor.click();
-              anchor.remove();
-              setSaveMessage("다운로드가 시작되었습니다. 갤러리 앱에서 확인하세요.");
-              window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
-            }
-          }
+        if (isRestrictedWebView()) {
+          // 카카오톡 등 인앱브라우저는 파일 저장이 제한됨 → 외부 브라우저 안내
+          setSaveMessage("카카오톡 내 브라우저에서는 저장이 제한됩니다. 우측 하단 더보기(⋯) → '다른 브라우저로 열기'를 눌러 Chrome에서 저장해 주세요.");
         } else {
-          const url = URL.createObjectURL(blob);
-          const anchor = document.createElement("a");
-          anchor.href = url;
-          anchor.download = filename;
-          document.body.appendChild(anchor);
-          anchor.click();
-          anchor.remove();
-          setSaveMessage("다운로드가 시작되었습니다. 갤러리 앱에서 확인하세요.");
-          window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
+          const file = new File([blob], filename, { type: "image/png" });
+          let shared = false;
+          try {
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              await navigator.share({ files: [file], title: filename });
+              setSaveMessage("갤러리 앱에서 저장을 선택하세요.");
+              shared = true;
+            }
+          } catch (err) {
+            if ((err as DOMException).name === "AbortError") shared = true; // 사용자가 직접 닫음
+          }
+          if (!shared) {
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement("a");
+            anchor.href = url;
+            anchor.download = filename;
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+            setSaveMessage("다운로드가 시작되었습니다. 갤러리 앱에서 확인하세요.");
+            window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
+          }
         }
       } else {
         const url = URL.createObjectURL(blob);
