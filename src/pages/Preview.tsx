@@ -6,27 +6,10 @@ import { buildDownloadName, renderPhotoboothImage } from "../lib/canvasRender";
 import { usePhotoboothStore } from "../store/usePhotoboothStore";
 import { trackEvent } from "../lib/analytics";
 
-async function copyText(value: string) {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(value);
-    return;
-  }
-  const temp = document.createElement("textarea");
-  temp.value = value;
-  temp.setAttribute("readonly", "true");
-  temp.style.position = "absolute";
-  temp.style.left = "-9999px";
-  document.body.appendChild(temp);
-  temp.select();
-  document.execCommand("copy");
-  temp.remove();
-}
-
 export default function Preview() {
   const navigate = useNavigate();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const selectedTemplateId = usePhotoboothStore((state) => state.selectedTemplateId);
   const photos = usePhotoboothStore((state) => state.photos);
@@ -34,8 +17,6 @@ export default function Preview() {
   const stickers = usePhotoboothStore((state) => state.stickers);
   const textLine = usePhotoboothStore((state) => state.textLine);
   const textFont = usePhotoboothStore((state) => state.textFont);
-  const caption = usePhotoboothStore((state) => state.caption);
-  const setCaption = usePhotoboothStore((state) => state.setCaption);
 
   const template = useMemo(
     () => TEMPLATES.find((item) => item.id === selectedTemplateId) ?? TEMPLATES[0],
@@ -73,11 +54,15 @@ export default function Preview() {
       });
     })();
 
-    return () => { canceled = true; };
+    return () => {
+      canceled = true;
+    };
   }, [template, photos, filter, stickers, textLine, font]);
 
   useEffect(() => {
-    return () => { if (previewUrl) URL.revokeObjectURL(previewUrl); };
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
   }, [previewUrl]);
 
   if (photos.length !== 4) return <Navigate to="/capture" replace />;
@@ -112,16 +97,8 @@ export default function Preview() {
     }
   }
 
-  async function handleCopyCaption() {
-    await copyText(caption);
-    trackEvent("caption_copied");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
   return (
     <main className="preview-page">
-      {/* Header */}
       <div className="page-header">
         <button
           className="page-header-back"
@@ -137,44 +114,19 @@ export default function Preview() {
         </div>
       </div>
 
-      {/* Preview image */}
-      <div className="preview-image-wrap">
+      <div className="preview-image-wrap preview-image-wrap-only">
         <div className="preview-image-shell">
           {previewUrl ? (
             <img src={previewUrl} alt="Final 4-cut preview" />
           ) : (
-            <p className="preview-rendering-text">Rendering... ✨</p>
+            <p className="preview-rendering-text">Rendering...</p>
           )}
         </div>
       </div>
 
-      {/* Scrollable content: caption */}
-      <div className="preview-content-scroll">
-        <div className="panel caption-card">
-          <label className="caption-label" htmlFor="caption">
-            📝 Caption
-          </label>
-          <textarea
-            id="caption"
-            className="caption-textarea"
-            value={caption}
-            onChange={(event) => setCaption(event.target.value)}
-            rows={4}
-          />
-          <button
-            className="caption-copy-btn"
-            type="button"
-            onClick={() => void handleCopyCaption()}
-          >
-            {copied ? "✓ Copied!" : "📋 Copy Caption"}
-          </button>
-        </div>
-      </div>
-
-      {/* Fixed bottom CTA */}
       <div className="preview-bottom-cta">
         <Button onClick={() => void handleDownload()} disabled={working}>
-          {working ? "Rendering..." : "⬇ Save PNG (1080×1350)"}
+          {working ? "Rendering..." : "Save PNG (1080x1350)"}
         </Button>
       </div>
     </main>

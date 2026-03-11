@@ -32,15 +32,15 @@ type TemplateLayout = {
 function getTemplateLayout(templateId: string): TemplateLayout {
   if (templateId === "signature") {
     return {
-      panelInsetX: 320,
+      panelInsetX: 270,
       panelInsetY: 10,
       panelRadius: 44,
       panelBorderWidth: 14,
       panelFill: "#E9E1D7",
       panelBorder: "#D75A8E",
       slotTop: 86,
-      slotWidth: 426,
-      slotHeight: 258,
+      slotWidth: 510,
+      slotHeight: 272,
       slotGap: 22,
       watermarkWidth: 132,
       watermarkBottom: 34,
