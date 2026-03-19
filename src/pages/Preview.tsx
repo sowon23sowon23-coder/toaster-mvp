@@ -8,7 +8,7 @@ import { trackEvent } from "../lib/analytics";
 
 const isIosDevice = () =>
   /iPad|iPhone|iPod/.test(navigator.userAgent)
-  || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.userAgent));
 
 const isAndroidDevice = () => /Android/i.test(navigator.userAgent);
 
@@ -42,6 +42,7 @@ export default function Preview() {
   const [fullResBlob, setFullResBlob] = useState<Blob | null>(null);
   const [working, setWorking] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [saveOverlayUrl, setSaveOverlayUrl] = useState<string | null>(null);
 
   const selectedTemplateId = usePhotoboothStore((state) => state.selectedTemplateId);
   const photos = usePhotoboothStore((state) => state.photos);
@@ -116,6 +117,13 @@ export default function Preview() {
     };
   }, [previewUrl]);
 
+  function closeSaveOverlay() {
+    setSaveOverlayUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+  }
+
   if (photos.length !== 4) return <Navigate to="/capture" replace />;
 
   async function handleDownload() {
@@ -153,33 +161,46 @@ export default function Preview() {
         await writable.write(blob);
         await writable.close();
         setSaveMessage("Saved to your device.");
+      } else if (isRestrictedWebView()) {
+        // 카카오톡 등 인앱브라우저: Web Share 먼저 시도, 실패 시 이미지 직접 표시
+        const file = new File([blob], filename, { type: "image/png" });
+        let shared = false;
+        try {
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title: filename });
+            setSaveMessage("갤러리 앱에서 저장을 선택하세요.");
+            shared = true;
+          }
+        } catch (err) {
+          if ((err as DOMException).name === "AbortError") shared = true;
+        }
+        if (!shared) {
+          // 공유 불가 → 이미지를 전체화면으로 표시하고 길게 눌러 저장 안내
+          const url = URL.createObjectURL(blob);
+          setSaveOverlayUrl(url);
+        }
       } else if (isAndroidDevice()) {
-        if (isRestrictedWebView()) {
-          // 카카오톡 등 인앱브라우저는 파일 저장이 제한됨 → 외부 브라우저 안내
-          setSaveMessage("카카오톡 내 브라우저에서는 저장이 제한됩니다. 우측 하단 더보기(⋯) → '다른 브라우저로 열기'를 눌러 Chrome에서 저장해 주세요.");
-        } else {
-          const file = new File([blob], filename, { type: "image/png" });
-          let shared = false;
-          try {
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-              await navigator.share({ files: [file], title: filename });
-              setSaveMessage("갤러리 앱에서 저장을 선택하세요.");
-              shared = true;
-            }
-          } catch (err) {
-            if ((err as DOMException).name === "AbortError") shared = true; // 사용자가 직접 닫음
+        const file = new File([blob], filename, { type: "image/png" });
+        let shared = false;
+        try {
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title: filename });
+            setSaveMessage("갤러리 앱에서 저장을 선택하세요.");
+            shared = true;
           }
-          if (!shared) {
-            const url = URL.createObjectURL(blob);
-            const anchor = document.createElement("a");
-            anchor.href = url;
-            anchor.download = filename;
-            document.body.appendChild(anchor);
-            anchor.click();
-            anchor.remove();
-            setSaveMessage("다운로드가 시작되었습니다. 갤러리 앱에서 확인하세요.");
-            window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
-          }
+        } catch (err) {
+          if ((err as DOMException).name === "AbortError") shared = true; // 사용자가 직접 닫음
+        }
+        if (!shared) {
+          const url = URL.createObjectURL(blob);
+          const anchor = document.createElement("a");
+          anchor.href = url;
+          anchor.download = filename;
+          document.body.appendChild(anchor);
+          anchor.click();
+          anchor.remove();
+          setSaveMessage("다운로드가 시작되었습니다. 갤러리 앱에서 확인하세요.");
+          window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
         }
       } else {
         const url = URL.createObjectURL(blob);
@@ -241,6 +262,18 @@ export default function Preview() {
         </Button>
         {saveMessage && <p className="preview-save-message">{saveMessage}</p>}
       </div>
+
+      {saveOverlayUrl && (
+        <div className="save-overlay" onClick={closeSaveOverlay}>
+          <div className="save-overlay-inner" onClick={(e) => e.stopPropagation()}>
+            <p className="save-overlay-hint">이미지를 <strong>길게 눌러</strong> 저장하세요</p>
+            <img src={saveOverlayUrl} alt="저장할 이미지" className="save-overlay-img" />
+            <button type="button" className="save-overlay-close" onClick={closeSaveOverlay}>
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
