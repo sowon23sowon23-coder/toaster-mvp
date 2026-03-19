@@ -153,7 +153,7 @@ export default function Preview() {
           const writable = await handle.createWritable();
           await writable.write(blob);
           await writable.close();
-          setSaveMessage("저장되었습니다.");
+          setSaveMessage("Saved to your device.");
           trackEvent("download_clicked");
           return;
         } catch (err) {
@@ -167,7 +167,7 @@ export default function Preview() {
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
           await navigator.share({ files: [file], title: filename });
-          setSaveMessage("갤러리에서 저장하세요.");
+          setSaveMessage("Select Save in your gallery app.");
           trackEvent("download_clicked");
           return;
         } catch (err) {
@@ -197,13 +197,13 @@ export default function Preview() {
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
-      setSaveMessage("다운로드가 시작되었습니다.");
+      setSaveMessage("Download started.");
       window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
 
       trackEvent("download_clicked");
     } catch (err) {
       const detail = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
-      setSaveMessage(`저장에 실패했습니다. (${detail})`);
+      setSaveMessage(`Save failed. (${detail})`);
       console.error("Download failed:", err);
     } finally {
       setWorking(false);
@@ -247,10 +247,10 @@ export default function Preview() {
       {saveOverlayUrl && (
         <div className="save-overlay" onClick={closeSaveOverlay}>
           <div className="save-overlay-inner" onClick={(e) => e.stopPropagation()}>
-            <p className="save-overlay-hint">이미지를 <strong>길게 눌러</strong> 저장하세요</p>
-            <img src={saveOverlayUrl} alt="저장할 이미지" className="save-overlay-img" />
+            <p className="save-overlay-hint"><strong>Long-press</strong> the image to save</p>
+            <img src={saveOverlayUrl} alt="Save this image" className="save-overlay-img" />
             <button type="button" className="save-overlay-close" onClick={closeSaveOverlay}>
-              닫기
+              Close
             </button>
           </div>
         </div>
