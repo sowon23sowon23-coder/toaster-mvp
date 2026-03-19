@@ -828,9 +828,9 @@ body {
 .preview-image-wrap-only {
   flex: 1;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  padding: 8px 20px calc(96px + env(safe-area-inset-bottom));
 }
 
 .preview-image-shell {
@@ -839,13 +839,14 @@ body {
   border: 1px solid var(--line);
   aspect-ratio: 4 / 5;
   background: #f0eaf2;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 12px 40px rgba(100, 40, 80, 0.18), 0 2px 8px rgba(100, 40, 80, 0.10);
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 42dvh;
-  min-height: 200px;
-  max-height: 360px;
+  /* fill the available vertical space */
+  height: min(58dvh, calc(100dvw - 40px) * 5 / 4);
+  min-height: 240px;
+  max-height: 520px;
   width: auto;
   margin: 0 auto;
 }
@@ -873,58 +874,143 @@ body {
   z-index: 10;
 }
 
-.preview-save-message {
-  margin-top: 8px;
-  text-align: center;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--muted);
-}
-
-/* Save overlay (KakaoTalk / restricted WebView) */
-.save-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  z-index: 100;
+.preview-save-toast {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1a7a4a;
+  background: #edfbf3;
+  border: 1px solid #a3e6c0;
+  border-radius: 999px;
+  padding: 6px 14px;
 }
 
-.save-overlay-inner {
+/* Save button label with icon */
+.btn-save-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Save bottom sheet ── */
+.save-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 10, 25, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fade-in 0.2s ease;
+}
+
+.save-sheet {
+  background: #fff;
+  border-radius: 28px 28px 0 0;
+  width: min(100%, 480px);
+  padding: 12px 20px calc(28px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  max-width: 360px;
+  gap: 14px;
+  animation: sheet-up 0.32s cubic-bezier(0.34, 1.12, 0.64, 1);
+}
+
+.save-sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 99px;
+  background: #e0d0dc;
+  flex-shrink: 0;
+}
+
+.save-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
 }
 
-.save-overlay-hint {
-  color: #fff;
-  font-size: 1rem;
+.save-sheet-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text);
+  font-family: var(--font-brand);
+}
+
+.save-sheet-x {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f3edf5;
+  border: none;
+  color: var(--muted);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.save-sheet-hint {
+  font-size: 0.88rem;
+  color: var(--muted);
   text-align: center;
-  line-height: 1.5;
+  line-height: 1.55;
+  width: 100%;
 }
 
-.save-overlay-img {
+.save-sheet-hint strong {
+  color: var(--primary);
+}
+
+.save-sheet-img-wrap {
+  position: relative;
+  width: 68%;
+  max-width: 260px;
+}
+
+.save-sheet-img {
   width: 100%;
-  border-radius: 8px;
-  /* 길게 누르기로 저장 가능하도록 */
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(100, 40, 80, 0.22);
+  display: block;
   -webkit-touch-callout: default;
   touch-action: manipulation;
 }
 
-.save-overlay-close {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 8px;
-  padding: 10px 32px;
-  font-size: 0.9rem;
-  cursor: pointer;
+.save-sheet-img-wrap::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 22px;
+  border: 2.5px solid var(--primary);
+  opacity: 0;
+  animation: pulse-ring 2s ease-in-out 0.5s infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse-ring {
+  0%   { opacity: 0; transform: scale(0.95); }
+  40%  { opacity: 0.55; }
+  100% { opacity: 0; transform: scale(1.04); }
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* ============================================================
