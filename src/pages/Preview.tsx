@@ -118,10 +118,7 @@ export default function Preview() {
   }, [previewUrl]);
 
   function closeSaveOverlay() {
-    setSaveOverlayUrl((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return null;
-    });
+    setSaveOverlayUrl(null);
   }
 
   if (photos.length !== 4) return <Navigate to="/capture" replace />;
@@ -175,9 +172,15 @@ export default function Preview() {
           if ((err as DOMException).name === "AbortError") shared = true;
         }
         if (!shared) {
-          // 공유 불가 → 이미지를 전체화면으로 표시하고 길게 눌러 저장 안내
-          const url = URL.createObjectURL(blob);
-          setSaveOverlayUrl(url);
+          // 공유 불가 → data URL로 변환 후 전체화면 표시 (길게 눌러 저장)
+          // blob URL은 KakaoTalk WebView에서 길게 눌러도 저장이 안 될 수 있음
+          const dataUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+          setSaveOverlayUrl(dataUrl);
         }
       } else if (isAndroidDevice()) {
         const file = new File([blob], filename, { type: "image/png" });
@@ -222,7 +225,8 @@ export default function Preview() {
 
       trackEvent("download_clicked");
     } catch (err) {
-      setSaveMessage("저장에 실패했습니다. 다시 시도해 주세요.");
+      const detail = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+      setSaveMessage(`저장에 실패했습니다. (${detail})`);
       console.error("Download failed:", err);
     } finally {
       setWorking(false);
