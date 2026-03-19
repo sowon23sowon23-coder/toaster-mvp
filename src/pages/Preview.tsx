@@ -127,7 +127,6 @@ export default function Preview() {
     setWorking(true);
     setSaveMessage(null);
     try {
-      // 미리 렌더된 고해상도 blob 사용, 없으면 즉시 렌더링
       const blob = fullResBlob ?? await renderPhotoboothImage({
         photos,
         template,
@@ -142,86 +141,64 @@ export default function Preview() {
       });
 
       const filename = buildDownloadName();
+
+      // 1단계: 데스크톱 파일 피커 (Chrome/Edge desktop)
       const pickerWindow = window as SaveFilePickerWindow;
-
-      if (pickerWindow.showSaveFilePicker) {
-        const handle = await pickerWindow.showSaveFilePicker({
-          suggestedName: filename,
-          types: [
-            {
-              description: "PNG image",
-              accept: { "image/png": [".png"] },
-            },
-          ],
-        });
-        const writable = await handle.createWritable();
-        await writable.write(blob);
-        await writable.close();
-        setSaveMessage("Saved to your device.");
-      } else if (isRestrictedWebView()) {
-        // 카카오톡 등 인앱브라우저: Web Share 먼저 시도, 실패 시 이미지 직접 표시
-        const file = new File([blob], filename, { type: "image/png" });
-        let shared = false;
+      if (pickerWindow.showSaveFilePicker && !isIosDevice() && !isAndroidDevice()) {
         try {
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({ files: [file], title: filename });
-            setSaveMessage("갤러리 앱에서 저장을 선택하세요.");
-            shared = true;
-          }
-        } catch (err) {
-          if ((err as DOMException).name === "AbortError") shared = true;
-        }
-        if (!shared) {
-          // 공유 불가 → data URL로 변환 후 전체화면 표시 (길게 눌러 저장)
-          // blob URL은 KakaoTalk WebView에서 길게 눌러도 저장이 안 될 수 있음
-          const dataUrl = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
+          const handle = await pickerWindow.showSaveFilePicker({
+            suggestedName: filename,
+            types: [{ description: "PNG image", accept: { "image/png": [".png"] } }],
           });
-          setSaveOverlayUrl(dataUrl);
-        }
-      } else if (isAndroidDevice()) {
-        const file = new File([blob], filename, { type: "image/png" });
-        let shared = false;
-        try {
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({ files: [file], title: filename });
-            setSaveMessage("갤러리 앱에서 저장을 선택하세요.");
-            shared = true;
-          }
+          const writable = await handle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+          setSaveMessage("저장되었습니다.");
+          trackEvent("download_clicked");
+          return;
         } catch (err) {
-          if ((err as DOMException).name === "AbortError") shared = true; // 사용자가 직접 닫음
-        }
-        if (!shared) {
-          const url = URL.createObjectURL(blob);
-          const anchor = document.createElement("a");
-          anchor.href = url;
-          anchor.download = filename;
-          document.body.appendChild(anchor);
-          anchor.click();
-          anchor.remove();
-          setSaveMessage("다운로드가 시작되었습니다. 갤러리 앱에서 확인하세요.");
-          window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
-        }
-      } else {
-        const url = URL.createObjectURL(blob);
-        const anchor = document.createElement("a");
-        anchor.href = url;
-        anchor.download = filename;
-        document.body.appendChild(anchor);
-        anchor.click();
-        anchor.remove();
-
-        if (isIosDevice()) {
-          setSaveMessage("iPhone may block direct downloads. If nothing downloads, open in Safari and use Share > Save to Photos.");
-          window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
-        } else {
-          setSaveMessage("Download started.");
-          window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
+          if ((err as DOMException).name === "AbortError") return;
+          // 실패하면 다음 방법으로
         }
       }
+
+      // 2단계: Web Share API (iOS Safari 14.5+, Android Chrome, 일부 인앱브라우저)
+      const file = new File([blob], filename, { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: filename });
+          setSaveMessage("갤러리에서 저장하세요.");
+          trackEvent("download_clicked");
+          return;
+        } catch (err) {
+          if ((err as DOMException).name === "AbortError") return;
+          // 실패하면 다음 방법으로
+        }
+      }
+
+      // 3단계: 카카오톡 등 Web Share 불가 인앱브라우저 → 오버레이 표시
+      if (isRestrictedWebView() || isIosDevice()) {
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        setSaveOverlayUrl(dataUrl);
+        trackEvent("download_clicked");
+        return;
+      }
+
+      // 4단계: 데스크톱 앵커 다운로드 (Firefox 등)
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setSaveMessage("다운로드가 시작되었습니다.");
+      window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
 
       trackEvent("download_clicked");
     } catch (err) {
