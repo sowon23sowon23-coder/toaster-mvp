@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import StickerCanvasOverlay from "../components/StickerCanvasOverlay";
 import Button from "../components/Button";
+import StickerCanvasOverlay from "../components/StickerCanvasOverlay";
 import { FILTERS, FONTS, STICKER_ASSETS, TEMPLATES } from "../lib/assets";
 import { renderPhotoboothImage } from "../lib/canvasRender";
 import { usePhotoboothStore } from "../store/usePhotoboothStore";
@@ -115,105 +115,107 @@ export default function Edit() {
         </div>
       </div>
 
-      <div className="edit-preview-wrap">
-        <StickerCanvasOverlay
-          previewSrc={previewUrl}
-          stickers={stickers}
-          selectedStickerId={selectedStickerId}
-          onSelectSticker={setSelectedStickerId}
-          onMoveSticker={moveSticker}
-        />
-      </div>
-
-      <div className="edit-controls">
-        <div className="edit-tab-bar" role="tablist">
-          {(["filter", "sticker"] as EditTab[]).map((tab) => (
-            <button
-              key={tab}
-              type="button"
-              role="tab"
-              aria-selected={activeTab === tab}
-              className={`edit-tab-btn${activeTab === tab ? " active" : ""}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              <span className="edit-tab-icon">{TAB_ICONS[tab]}</span>
-              <span className="edit-tab-label">{tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
-            </button>
-          ))}
+      <div className="edit-workspace">
+        <div className="edit-preview-wrap">
+          <StickerCanvasOverlay
+            previewSrc={previewUrl}
+            stickers={stickers}
+            selectedStickerId={selectedStickerId}
+            onSelectSticker={setSelectedStickerId}
+            onMoveSticker={moveSticker}
+          />
         </div>
 
-        <div className="edit-panel-scroll">
-          {activeTab === "filter" && (
-            <section className="panel edit-panel">
-              <p className="edit-panel-hint">Tap to apply a filter</p>
-              <div className="filter-grid">
-                {FILTERS.map((item) => {
-                  const isActive = item.id === selectedFilterId;
-                  return (
-                    <button
-                      key={item.id}
-                      className={`filter-card${isActive ? " active" : ""}`}
-                      type="button"
-                      onClick={() => setFilter(item.id)}
-                    >
-                      <div className="filter-swatch" style={{ background: FILTER_SWATCHES[item.id] }} />
-                      <span className="filter-name">{item.name}</span>
-                      {isActive && <span className="filter-check">✓</span>}
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-          )}
+        <div className="edit-controls">
+          <div className="edit-tab-bar" role="tablist">
+            {(["filter", "sticker"] as EditTab[]).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === tab}
+                className={`edit-tab-btn${activeTab === tab ? " active" : ""}`}
+                onClick={() => setActiveTab(tab)}
+              >
+                <span className="edit-tab-icon">{TAB_ICONS[tab]}</span>
+                <span className="edit-tab-label">{tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
+              </button>
+            ))}
+          </div>
 
-          {activeTab === "sticker" && (
-            <section className="panel edit-panel">
-              <p className="edit-panel-hint">Tap a sticker to add it</p>
-              <div className="sticker-grid">
-                {STICKER_ASSETS.map((src) => (
-                  <button
-                    key={src}
-                    className="sticker-thumb-v2"
-                    type="button"
-                    onClick={() => addSticker(src)}
-                  >
-                    <img src={src} alt="sticker" />
-                  </button>
-                ))}
-              </div>
-              {selectedSticker && (
-                <div className="sticker-editor">
-                  <div className="sticker-editor-header">
-                    <span className="sticker-editor-title">Edit Sticker</span>
-                    <button
-                      className="sticker-delete-btn"
-                      type="button"
-                      onClick={() => {
-                        removeSticker(selectedSticker.id);
-                        setSelectedStickerId(null);
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                  <div className="scale-row">
-                    <span className="scale-icon">-</span>
-                    <input
-                      id="scale"
-                      type="range"
-                      className="scale-slider"
-                      min={0.08}
-                      max={0.42}
-                      step={0.01}
-                      value={selectedSticker.scale}
-                      onChange={(event) => scaleSticker(selectedSticker.id, Number(event.target.value))}
-                    />
-                    <span className="scale-icon">+</span>
-                  </div>
+          <div className="edit-panel-scroll">
+            {activeTab === "filter" && (
+              <section className="panel edit-panel">
+                <p className="edit-panel-hint">Tap to apply a filter</p>
+                <div className="filter-grid">
+                  {FILTERS.map((item) => {
+                    const isActive = item.id === selectedFilterId;
+                    return (
+                      <button
+                        key={item.id}
+                        className={`filter-card${isActive ? " active" : ""}`}
+                        type="button"
+                        onClick={() => setFilter(item.id)}
+                      >
+                        <div className="filter-swatch" style={{ background: FILTER_SWATCHES[item.id] }} />
+                        <span className="filter-name">{item.name}</span>
+                        {isActive && <span className="filter-check">✓</span>}
+                      </button>
+                    );
+                  })}
                 </div>
-              )}
-            </section>
-          )}
+              </section>
+            )}
+
+            {activeTab === "sticker" && (
+              <section className="panel edit-panel">
+                <p className="edit-panel-hint">Tap a sticker to add it</p>
+                <div className="sticker-grid">
+                  {STICKER_ASSETS.map((src) => (
+                    <button
+                      key={src}
+                      className="sticker-thumb-v2"
+                      type="button"
+                      onClick={() => addSticker(src)}
+                    >
+                      <img src={src} alt="sticker" />
+                    </button>
+                  ))}
+                </div>
+                {selectedSticker && (
+                  <div className="sticker-editor">
+                    <div className="sticker-editor-header">
+                      <span className="sticker-editor-title">Edit Sticker</span>
+                      <button
+                        className="sticker-delete-btn"
+                        type="button"
+                        onClick={() => {
+                          removeSticker(selectedSticker.id);
+                          setSelectedStickerId(null);
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                    <div className="scale-row">
+                      <span className="scale-icon">-</span>
+                      <input
+                        id="scale"
+                        type="range"
+                        className="scale-slider"
+                        min={0.08}
+                        max={0.42}
+                        step={0.01}
+                        value={selectedSticker.scale}
+                        onChange={(event) => scaleSticker(selectedSticker.id, Number(event.target.value))}
+                      />
+                      <span className="scale-icon">+</span>
+                    </div>
+                  </div>
+                )}
+              </section>
+            )}
+          </div>
         </div>
       </div>
 

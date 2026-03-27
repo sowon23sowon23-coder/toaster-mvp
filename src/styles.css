@@ -482,7 +482,7 @@ body {
 .edit-screen {
   display: flex;
   flex-direction: column;
-  width: min(100%, 430px);
+  width: min(100%, 980px);
   margin: 0 auto;
   min-height: 100dvh;
   overflow-y: auto;
@@ -491,6 +491,12 @@ body {
 
 .edit-screen .header {
   flex-shrink: 0;
+}
+
+.edit-workspace {
+  display: grid;
+  gap: 18px;
+  align-items: start;
 }
 
 .edit-preview-wrap {
@@ -517,6 +523,7 @@ body {
 .edit-controls {
   display: flex;
   flex-direction: column;
+  gap: 10px;
   padding-bottom: calc(68px + env(safe-area-inset-bottom));
 }
 
@@ -587,7 +594,7 @@ body {
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  width: min(100%, 430px);
+  width: min(100%, 980px);
   bottom: 0;
   padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
   background: linear-gradient(180deg, rgba(249, 228, 244, 0) 0%, rgba(249, 228, 244, 0.97) 28%);
@@ -1136,5 +1143,42 @@ body {
   .edit-screen, .preview-page, .bottom-cta,
   .edit-bottom-cta, .preview-bottom-cta {
     width: min(100%, 480px);
+  }
+}
+
+@media (min-width: 860px) {
+  .edit-screen,
+  .edit-bottom-cta {
+    width: min(100%, 980px);
+  }
+
+  .edit-workspace {
+    grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .edit-preview-wrap {
+    position: sticky;
+    top: 18px;
+    margin-top: 18px;
+    justify-content: flex-start;
+  }
+
+  .edit-preview-wrap .preview-stage {
+    width: min(320px, 100%);
+    margin: 0;
+  }
+
+  .edit-controls {
+    min-width: 0;
+    padding-top: 18px;
+  }
+
+  .filter-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .sticker-grid {
+    grid-template-columns: repeat(5, 1fr);
   }
 }
