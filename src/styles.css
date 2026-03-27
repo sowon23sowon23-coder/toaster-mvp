@@ -495,7 +495,8 @@ body {
 
 .edit-workspace {
   display: grid;
-  gap: 18px;
+  grid-template-columns: minmax(128px, 142px) minmax(0, 1fr);
+  gap: 12px;
   align-items: start;
 }
 
@@ -503,7 +504,7 @@ body {
   flex-shrink: 0;
   margin-top: 12px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-start;
   height: auto;
   min-height: 0;
@@ -512,10 +513,10 @@ body {
 
 .edit-preview-wrap .preview-stage {
   aspect-ratio: 480 / 1367;
-  width: min(220px, 54vw);
+  width: 100%;
   height: auto;
   max-width: 100%;
-  margin: 0 auto 10px;
+  margin: 0;
   background: transparent;
   border: 0;
 }
@@ -525,6 +526,7 @@ body {
   flex-direction: column;
   gap: 10px;
   padding-bottom: calc(68px + env(safe-area-inset-bottom));
+  min-width: 0;
 }
 
 .edit-tab-bar {
@@ -604,8 +606,8 @@ body {
 /* Filter grid */
 .filter-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 7px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
 }
 
 .filter-card {
@@ -637,7 +639,7 @@ body {
 }
 
 .filter-name {
-  font-size: 0.58rem;
+  font-size: 0.55rem;
   font-weight: 700;
   color: var(--muted);
   text-align: center;
@@ -658,7 +660,7 @@ body {
 /* Sticker grid */
 .sticker-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
 }
 
