@@ -64,7 +64,8 @@ public/
     sprinkle.png
     minimal.png
   stickers/
-    sticker-01.png ... sticker-12.png
+    pineapple.png
+    sticker1.png ... sticker6.png
 ```
 
 ## Real Asset Replacement
@@ -75,6 +76,9 @@ Replace placeholder assets with production assets:
 - `/public/stickers/*.png`
 - `/public/brand/logo_placeholder.png`
 - `/public/brand/yogurtland_mark.png`
+
+Sticker assets are loaded from [`src/lib/assets.ts`](./src/lib/assets.ts) using the `/public/stickers` folder.
+To add a new sticker, place the image in `/public/stickers` and add its file name to `STICKER_FILES`.
 
 Expected frame size: `1080x1350` transparent PNG.
 

@@ -60,10 +60,29 @@ export const FONTS: FontConfig[] = [
   { id: "mono", name: "Booth Mono", cssFamily: "'Courier New', Courier, monospace" },
 ];
 
-export const STICKER_ASSETS = [
-  "/pineapple.png",
-  ...Array.from({ length: 6 }, (_, i) => `/sticker${i + 1}.png`),
-];
+const STICKER_FILES = [
+  "pineapple.png",
+  "sticker1.png",
+  "sticker2.png",
+  "sticker3.png",
+  "sticker4.png",
+  "sticker5.png",
+  "sticker6.png",
+  "sticker7.png",
+  "sticker8.png",
+  "sticker9.png",
+  "sticker10.png",
+  "sticker11.png",
+  "sticker12.png",
+  "sticker13.png",
+  "sticker14.png",
+  "sticker15.png",
+  "sticker16.png",
+  "sticker17.png",
+  "sticker18.png",
+] as const;
+
+export const STICKER_ASSETS = STICKER_FILES.map((fileName) => `/stickers/${fileName}`);
 
 export const DEFAULT_CAPTION = `Sweet moments in every cut
 #SweetMoment #ShareTheJoy`;
