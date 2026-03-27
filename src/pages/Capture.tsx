@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import { captureVideoFrame, startPreferredCamera, stopCamera } from "../lib/camera";
-import { TEMPLATES } from "../lib/assets";
 import { usePhotoboothStore } from "../store/usePhotoboothStore";
 import { trackEvent } from "../lib/analytics";
 
@@ -13,7 +12,6 @@ export default function Capture() {
   const navigate = useNavigate();
   const setPhotos = usePhotoboothStore((state) => state.setPhotos);
   const resetPhotos = usePhotoboothStore((state) => state.resetPhotos);
-  const selectedTemplateId = usePhotoboothStore((state) => state.selectedTemplateId);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -23,11 +21,6 @@ export default function Capture() {
   const [countdown, setCountdown] = useState(0);
   const [captureIndex, setCaptureIndex] = useState(0);
   const [isCapturing, setIsCapturing] = useState(false);
-
-  const template = useMemo(
-    () => TEMPLATES.find((item) => item.id === selectedTemplateId) ?? TEMPLATES[0],
-    [selectedTemplateId],
-  );
 
   useEffect(() => {
     void requestCamera();
@@ -126,7 +119,7 @@ export default function Capture() {
       <div className="capture-camera-wrap">
         <div className="capture-stage">
           <video ref={videoRef} autoPlay muted playsInline />
-          <img className="capture-frame-overlay" src={template.frameSrc} alt="" aria-hidden="true" />
+          <div className="capture-shot-frame" aria-hidden="true" />
         </div>
 
         {!cameraReady && !permissionError && (

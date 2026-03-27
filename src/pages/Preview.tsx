@@ -77,8 +77,8 @@ export default function Preview() {
         textFont: font,
         frameSrc: template.frameSrc,
         watermarkSrc: "/brand/yogurtland_mark.png",
-        width: 684,
-        height: 240,
+        width: 240,
+        height: 684,
       });
 
       if (canceled) return;
@@ -98,8 +98,8 @@ export default function Preview() {
         textFont: font,
         frameSrc: template.frameSrc,
         watermarkSrc: "/brand/yogurtland_mark.png",
-        width: 1367,
-        height: 480,
+        width: 480,
+        height: 1367,
       });
 
       if (canceled) return;
@@ -136,8 +136,8 @@ export default function Preview() {
         textFont: font,
         frameSrc: template.frameSrc,
         watermarkSrc: "/brand/yogurtland_mark.png",
-        width: 1367,
-        height: 480,
+        width: 480,
+        height: 1367,
       });
 
       const filename = buildDownloadName();

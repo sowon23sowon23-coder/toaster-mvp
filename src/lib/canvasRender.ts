@@ -33,8 +33,8 @@ type TemplateLayout = {
   watermarkBottom: number;
 };
 
-const OUTPUT_WIDTH = 1367;
-const OUTPUT_HEIGHT = 480;
+const OUTPUT_WIDTH = 480;
+const OUTPUT_HEIGHT = 1367;
 
 function getTemplateLayout(templateId: string): TemplateLayout {
   if (templateId === "signature") {
@@ -48,10 +48,10 @@ function getTemplateLayout(templateId: string): TemplateLayout {
       panelBorderWidth: 10,
       panelFill: "#E9E1D7",
       panelBorder: "#D75A8E",
-      slotLeft: 27,
+      slotLeft: 45,
       slotTop: 27,
-      slotWidth: 308,
-      slotHeight: 408,
+      slotWidth: 408,
+      slotHeight: 308,
       slotGap: 11,
       watermarkWidth: 96,
       watermarkBottom: 12,
@@ -68,10 +68,10 @@ function getTemplateLayout(templateId: string): TemplateLayout {
     panelBorderWidth: 0,
     panelFill: "",
     panelBorder: "",
-    slotLeft: 27,
+    slotLeft: 45,
     slotTop: 27,
-    slotWidth: 308,
-    slotHeight: 408,
+    slotWidth: 408,
+    slotHeight: 308,
     slotGap: 11,
     watermarkWidth: 96,
     watermarkBottom: 12,
@@ -189,35 +189,35 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
     top: Math.round(layout.slotTop * scaleY),
     width: Math.round(layout.slotWidth * scaleX),
     height: Math.round(layout.slotHeight * scaleY),
-    gap: Math.round(layout.slotGap * scaleX),
+    gap: Math.round(layout.slotGap * scaleY),
   };
 
   ctx.filter = options.filter.canvasFilter;
   for (let i = 0; i < 4; i += 1) {
     const photo = options.photos[i];
-    const x = slot.left + i * (slot.width + slot.gap);
+    const y = slot.top + i * (slot.height + slot.gap);
 
     ctx.fillStyle = "#f4f0ea";
-    ctx.fillRect(x, slot.top, slot.width, slot.height);
+    ctx.fillRect(slot.left, y, slot.width, slot.height);
 
     if (photo) {
       try {
         const image = await loadImageFromBlob(photo);
         ctx.save();
         ctx.beginPath();
-        ctx.rect(x, slot.top, slot.width, slot.height);
+        ctx.rect(slot.left, y, slot.width, slot.height);
         ctx.clip();
-        drawCover(ctx, image, x, slot.top, slot.width, slot.height);
+        drawCover(ctx, image, slot.left, y, slot.width, slot.height);
         ctx.restore();
       } catch {
         ctx.fillStyle = "#DDD";
-        ctx.fillRect(x, slot.top, slot.width, slot.height);
+        ctx.fillRect(slot.left, y, slot.width, slot.height);
       }
     }
 
     ctx.strokeStyle = "rgba(0,0,0,0.08)";
     ctx.lineWidth = Math.max(2, Math.round(3 * scaleX));
-    ctx.strokeRect(x, slot.top, slot.width, slot.height);
+    ctx.strokeRect(slot.left, y, slot.width, slot.height);
   }
   ctx.filter = "none";
 
