@@ -35,8 +35,7 @@ export default function Edit() {
   const textFont = usePhotoboothStore((state) => state.textFont);
   const setFilter = usePhotoboothStore((state) => state.setFilter);
   const addSticker = usePhotoboothStore((state) => state.addSticker);
-  const moveSticker = usePhotoboothStore((state) => state.moveSticker);
-  const scaleSticker = usePhotoboothStore((state) => state.scaleSticker);
+  const transformSticker = usePhotoboothStore((state) => state.transformSticker);
   const removeSticker = usePhotoboothStore((state) => state.removeSticker);
   const setTextLine = usePhotoboothStore((state) => state.setTextLine);
 
@@ -122,7 +121,7 @@ export default function Edit() {
             stickers={stickers}
             selectedStickerId={selectedStickerId}
             onSelectSticker={setSelectedStickerId}
-            onMoveSticker={moveSticker}
+            onTransformSticker={(id, updates) => transformSticker(id, updates)}
           />
         </div>
 
@@ -197,20 +196,9 @@ export default function Edit() {
                         Delete
                       </button>
                     </div>
-                    <div className="scale-row">
-                      <span className="scale-icon">-</span>
-                      <input
-                        id="scale"
-                        type="range"
-                        className="scale-slider"
-                        min={0.08}
-                        max={0.42}
-                        step={0.01}
-                        value={selectedSticker.scale}
-                        onChange={(event) => scaleSticker(selectedSticker.id, Number(event.target.value))}
-                      />
-                      <span className="scale-icon">+</span>
-                    </div>
+                    <p className="gesture-hint">
+                      Drag with one finger. Use two fingers to resize and rotate.
+                    </p>
                   </div>
                 )}
               </section>

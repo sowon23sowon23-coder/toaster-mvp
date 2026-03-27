@@ -223,16 +223,20 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
 
   for (const sticker of options.stickers) {
     const stickerSize = sticker.scale * width;
-    const stickerX = sticker.x * width - stickerSize / 2;
-    const stickerY = sticker.y * height - stickerSize / 2;
+    const stickerX = sticker.x * width;
+    const stickerY = sticker.y * height;
 
     try {
       const image = await loadImage(sticker.src);
-      ctx.drawImage(image, stickerX, stickerY, stickerSize, stickerSize);
+      ctx.save();
+      ctx.translate(stickerX, stickerY);
+      ctx.rotate((sticker.rotation * Math.PI) / 180);
+      ctx.drawImage(image, -stickerSize / 2, -stickerSize / 2, stickerSize, stickerSize);
+      ctx.restore();
     } catch {
       ctx.fillStyle = "#ff6aa2";
       ctx.beginPath();
-      ctx.arc(stickerX + stickerSize / 2, stickerY + stickerSize / 2, stickerSize / 2, 0, Math.PI * 2);
+      ctx.arc(stickerX, stickerY, stickerSize / 2, 0, Math.PI * 2);
       ctx.fill();
     }
   }

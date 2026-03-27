@@ -695,6 +695,12 @@ body {
   gap: 10px;
 }
 
+.gesture-hint {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
 .sticker-editor-header {
   display: flex;
   justify-content: space-between;

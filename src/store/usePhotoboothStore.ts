@@ -7,6 +7,7 @@ export type StickerItem = {
   x: number;
   y: number;
   scale: number;
+  rotation: number;
 };
 
 type PhotoboothState = {
@@ -24,6 +25,8 @@ type PhotoboothState = {
   addSticker: (src: string) => void;
   moveSticker: (id: string, x: number, y: number) => void;
   scaleSticker: (id: string, scale: number) => void;
+  rotateSticker: (id: string, rotation: number) => void;
+  transformSticker: (id: string, updates: Partial<Pick<StickerItem, "x" | "y" | "scale" | "rotation">>) => void;
   removeSticker: (id: string) => void;
   setTextLine: (value: string) => void;
   setTextFont: (value: FontId) => void;
@@ -53,8 +56,9 @@ export const usePhotoboothStore = create<PhotoboothState>((set) => ({
           id: `sticker_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
           src,
           x: 0.5,
-          y: 0.46,
+          y: 0.5,
           scale: 0.18,
+          rotation: 0,
         },
       ],
     })),
@@ -70,6 +74,26 @@ export const usePhotoboothStore = create<PhotoboothState>((set) => ({
     set((state) => ({
       stickers: state.stickers.map((sticker) =>
         sticker.id === id ? { ...sticker, scale: clamp(scale, 0.08, 0.42) } : sticker,
+      ),
+    })),
+  rotateSticker: (id, rotation) =>
+    set((state) => ({
+      stickers: state.stickers.map((sticker) =>
+        sticker.id === id ? { ...sticker, rotation } : sticker,
+      ),
+    })),
+  transformSticker: (id, updates) =>
+    set((state) => ({
+      stickers: state.stickers.map((sticker) =>
+        sticker.id === id
+          ? {
+              ...sticker,
+              x: updates.x === undefined ? sticker.x : clamp(updates.x, 0.05, 0.95),
+              y: updates.y === undefined ? sticker.y : clamp(updates.y, 0.05, 0.95),
+              scale: updates.scale === undefined ? sticker.scale : clamp(updates.scale, 0.08, 0.42),
+              rotation: updates.rotation === undefined ? sticker.rotation : updates.rotation,
+            }
+          : sticker,
       ),
     })),
   removeSticker: (id) =>
