@@ -35,21 +35,21 @@ type TemplateLayout = {
 function getTemplateLayout(templateId: string): TemplateLayout {
   if (templateId === "signature") {
     return {
-      backdropInsetX: 150,
-      backdropInsetY: 6,
-      backdropRadius: 56,
-      panelInsetX: 165,
-      panelInsetY: 10,
-      panelRadius: 52,
+      backdropInsetX: 24,
+      backdropInsetY: 18,
+      backdropRadius: 44,
+      panelInsetX: 36,
+      panelInsetY: 24,
+      panelRadius: 38,
       panelBorderWidth: 14,
       panelFill: "#E9E1D7",
       panelBorder: "#D75A8E",
-      slotTop: 86,
-      slotWidth: 510,
-      slotHeight: 272,
-      slotGap: 22,
-      watermarkWidth: 132,
-      watermarkBottom: 34,
+      slotTop: 48,
+      slotWidth: 900,
+      slotHeight: 252,
+      slotGap: 18,
+      watermarkWidth: 176,
+      watermarkBottom: 44,
     };
   }
 
@@ -63,12 +63,12 @@ function getTemplateLayout(templateId: string): TemplateLayout {
     panelBorderWidth: 0,
     panelFill: "",
     panelBorder: "",
-    slotTop: 92,
-    slotWidth: 355,
-    slotHeight: 266,
-    slotGap: 22,
+    slotTop: 48,
+    slotWidth: 900,
+    slotHeight: 252,
+    slotGap: 18,
     watermarkWidth: 190,
-    watermarkBottom: 32,
+    watermarkBottom: 44,
   };
 }
 
@@ -171,6 +171,8 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
       panelHeight,
       Math.round(layout.panelRadius * scaleX),
     );
+    ctx.fillStyle = layout.panelFill;
+    ctx.fill();
     ctx.lineWidth = Math.max(4, Math.round(layout.panelBorderWidth * scaleX));
     ctx.strokeStyle = layout.panelBorder;
     ctx.stroke();
