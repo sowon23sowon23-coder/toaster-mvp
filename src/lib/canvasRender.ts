@@ -24,6 +24,7 @@ type TemplateLayout = {
   panelBorderWidth: number;
   panelFill: string;
   panelBorder: string;
+  slotLeft: number;
   slotTop: number;
   slotWidth: number;
   slotHeight: number;
@@ -32,24 +33,28 @@ type TemplateLayout = {
   watermarkBottom: number;
 };
 
+const OUTPUT_WIDTH = 1367;
+const OUTPUT_HEIGHT = 480;
+
 function getTemplateLayout(templateId: string): TemplateLayout {
   if (templateId === "signature") {
     return {
-      backdropInsetX: 24,
-      backdropInsetY: 18,
-      backdropRadius: 44,
-      panelInsetX: 36,
-      panelInsetY: 24,
-      panelRadius: 38,
-      panelBorderWidth: 14,
+      backdropInsetX: 12,
+      backdropInsetY: 12,
+      backdropRadius: 18,
+      panelInsetX: 18,
+      panelInsetY: 16,
+      panelRadius: 16,
+      panelBorderWidth: 10,
       panelFill: "#E9E1D7",
       panelBorder: "#D75A8E",
-      slotTop: 48,
-      slotWidth: 820,
-      slotHeight: 252,
-      slotGap: 18,
-      watermarkWidth: 176,
-      watermarkBottom: 44,
+      slotLeft: 27,
+      slotTop: 27,
+      slotWidth: 308,
+      slotHeight: 408,
+      slotGap: 11,
+      watermarkWidth: 96,
+      watermarkBottom: 12,
     };
   }
 
@@ -63,12 +68,13 @@ function getTemplateLayout(templateId: string): TemplateLayout {
     panelBorderWidth: 0,
     panelFill: "",
     panelBorder: "",
-    slotTop: 48,
-    slotWidth: 820,
-    slotHeight: 252,
-    slotGap: 18,
-    watermarkWidth: 190,
-    watermarkBottom: 44,
+    slotLeft: 27,
+    slotTop: 27,
+    slotWidth: 308,
+    slotHeight: 408,
+    slotGap: 11,
+    watermarkWidth: 96,
+    watermarkBottom: 12,
   };
 }
 
@@ -126,16 +132,16 @@ function drawCover(
 }
 
 export async function renderPhotoboothImage(options: RenderOptions): Promise<Blob> {
-  const width = options.width ?? 1080;
-  const height = options.height ?? 1350;
+  const width = options.width ?? OUTPUT_WIDTH;
+  const height = options.height ?? OUTPUT_HEIGHT;
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas is not supported.");
 
-  const scaleX = width / 1080;
-  const scaleY = height / 1350;
+  const scaleX = width / OUTPUT_WIDTH;
+  const scaleY = height / OUTPUT_HEIGHT;
   const layout = getTemplateLayout(options.template.id);
 
   if (options.template.id !== "signature") {
@@ -179,39 +185,39 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
   }
 
   const slot = {
+    left: Math.round(layout.slotLeft * scaleX),
     top: Math.round(layout.slotTop * scaleY),
     width: Math.round(layout.slotWidth * scaleX),
     height: Math.round(layout.slotHeight * scaleY),
-    gap: Math.round(layout.slotGap * scaleY),
+    gap: Math.round(layout.slotGap * scaleX),
   };
-  const photoLeft = Math.round((width - slot.width) / 2);
 
   ctx.filter = options.filter.canvasFilter;
   for (let i = 0; i < 4; i += 1) {
     const photo = options.photos[i];
-    const y = slot.top + i * (slot.height + slot.gap);
+    const x = slot.left + i * (slot.width + slot.gap);
 
     ctx.fillStyle = "#f4f0ea";
-    ctx.fillRect(photoLeft, y, slot.width, slot.height);
+    ctx.fillRect(x, slot.top, slot.width, slot.height);
 
     if (photo) {
       try {
         const image = await loadImageFromBlob(photo);
         ctx.save();
         ctx.beginPath();
-        ctx.rect(photoLeft, y, slot.width, slot.height);
+        ctx.rect(x, slot.top, slot.width, slot.height);
         ctx.clip();
-        drawCover(ctx, image, photoLeft, y, slot.width, slot.height);
+        drawCover(ctx, image, x, slot.top, slot.width, slot.height);
         ctx.restore();
       } catch {
         ctx.fillStyle = "#DDD";
-        ctx.fillRect(photoLeft, y, slot.width, slot.height);
+        ctx.fillRect(x, slot.top, slot.width, slot.height);
       }
     }
 
     ctx.strokeStyle = "rgba(0,0,0,0.08)";
     ctx.lineWidth = Math.max(2, Math.round(3 * scaleX));
-    ctx.strokeRect(photoLeft, y, slot.width, slot.height);
+    ctx.strokeRect(x, slot.top, slot.width, slot.height);
   }
   ctx.filter = "none";
 
@@ -232,12 +238,12 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
   }
 
   if (options.textLine.trim()) {
-    const fontSize = Math.round(44 * scaleY);
+    const fontSize = Math.round(26 * scaleY);
     ctx.font = `700 ${fontSize}px ${options.textFont.cssFamily}`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#5f2e51";
-    ctx.fillText(options.textLine.trim(), width / 2, height - Math.round(128 * scaleY));
+    ctx.fillText(options.textLine.trim(), width / 2, height - Math.round(18 * scaleY));
   }
 
   if (options.template.id !== "signature") {

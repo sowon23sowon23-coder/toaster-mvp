@@ -379,8 +379,8 @@ body {
 .capture-stage {
   position: relative;
   width: min(100%, 380px);
-  aspect-ratio: 4 / 5;
-  border-radius: 24px;
+  aspect-ratio: 1367 / 480;
+  border-radius: 18px;
   overflow: hidden;
   background: #160f15;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.38);
@@ -505,8 +505,8 @@ body {
 }
 
 .edit-preview-wrap .preview-stage {
-  aspect-ratio: 4 / 5;
-  width: min(250px, 64vw);
+  aspect-ratio: 1367 / 480;
+  width: min(100%, 360px);
   height: auto;
   max-width: 100%;
   margin: 0 auto 10px;
@@ -806,7 +806,7 @@ body {
 .preview-stage {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1367 / 480;
   border-radius: var(--r-lg);
   overflow: hidden;
   border: 1px solid var(--line);
@@ -863,17 +863,17 @@ body {
   border-radius: var(--r-xl);
   overflow: hidden;
   border: 1px solid var(--line);
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1367 / 480;
   background: #f0eaf2;
   box-shadow: 0 12px 40px rgba(100, 40, 80, 0.18), 0 2px 8px rgba(100, 40, 80, 0.10);
   display: flex;
   align-items: center;
   justify-content: center;
   /* fill the available vertical space */
-  height: min(58dvh, calc(100dvw - 40px) * 5 / 4);
-  min-height: 240px;
-  max-height: 520px;
-  width: auto;
+  width: min(100%, 390px);
+  min-height: 120px;
+  max-height: 220px;
+  height: auto;
   margin: 0 auto;
 }
 
@@ -999,8 +999,7 @@ body {
 
 .save-sheet-img-wrap {
   position: relative;
-  width: 68%;
-  max-width: 260px;
+  width: min(100%, 320px);
 }
 
 .save-sheet-img {
@@ -1129,7 +1128,7 @@ body {
 .template-card p { color: var(--muted); font-size: 0.86rem; }
 .template-preview {
   border-radius: var(--r-sm); overflow: hidden;
-  border: 1px solid var(--line); aspect-ratio: 4 / 5; background: #f7f2f4;
+  border: 1px solid var(--line); aspect-ratio: 1367 / 480; background: #f7f2f4;
 }
 .template-preview img { width: 100%; height: 100%; object-fit: cover; }
 

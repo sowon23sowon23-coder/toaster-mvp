@@ -74,8 +74,8 @@ export default function Edit() {
         textFont: font,
         frameSrc: template.frameSrc,
         watermarkSrc: "/brand/yogurtland_mark.png",
-        width: 540,
-        height: 675,
+        width: 684,
+        height: 240,
       });
       if (canceled) return;
       const url = URL.createObjectURL(blob);
