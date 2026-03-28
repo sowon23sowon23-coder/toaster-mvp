@@ -17,12 +17,6 @@ type TemplateLayout = {
   backdropInsetX: number;
   backdropInsetY: number;
   backdropRadius: number;
-  panelInsetX: number;
-  panelInsetY: number;
-  panelRadius: number;
-  panelBorderWidth: number;
-  panelFill: string;
-  panelBorder: string;
   slotLeft: number;
   slotTop: number;
   slotWidth: number;
@@ -41,12 +35,6 @@ function getTemplateLayout(templateId: string): TemplateLayout {
       backdropInsetX: 12,
       backdropInsetY: 12,
       backdropRadius: 18,
-      panelInsetX: 18,
-      panelInsetY: 16,
-      panelRadius: 16,
-      panelBorderWidth: 10,
-      panelFill: "#E9E1D7",
-      panelBorder: "#D75A8E",
       slotLeft: 36,
       slotTop: 27,
       slotWidth: 408,
@@ -61,12 +49,6 @@ function getTemplateLayout(templateId: string): TemplateLayout {
     backdropInsetX: 0,
     backdropInsetY: 0,
     backdropRadius: 0,
-    panelInsetX: 0,
-    panelInsetY: 0,
-    panelRadius: 0,
-    panelBorderWidth: 0,
-    panelFill: "",
-    panelBorder: "",
     slotLeft: 36,
     slotTop: 27,
     slotWidth: 408,
@@ -161,24 +143,6 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
     );
     ctx.fillStyle = "#fffdfd";
     ctx.fill();
-
-    const panelX = Math.round(layout.panelInsetX * scaleX);
-    const panelY = Math.round(layout.panelInsetY * scaleY);
-    const panelWidth = width - panelX * 2;
-    const panelHeight = height - panelY * 2;
-    drawRoundedRect(
-      ctx,
-      panelX,
-      panelY,
-      panelWidth,
-      panelHeight,
-      Math.round(layout.panelRadius * scaleX),
-    );
-    ctx.fillStyle = layout.panelFill;
-    ctx.fill();
-    ctx.lineWidth = Math.max(4, Math.round(layout.panelBorderWidth * scaleX));
-    ctx.strokeStyle = layout.panelBorder;
-    ctx.stroke();
   }
 
   const slot = {
