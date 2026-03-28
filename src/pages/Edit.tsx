@@ -71,7 +71,6 @@ export default function Edit() {
         stickers,
         textLine: "",
         textFont: font,
-        frameSrc: template.frameSrc,
         watermarkSrc: "/brand/yogurtland_mark.png",
         width: 240,
         height: 684,

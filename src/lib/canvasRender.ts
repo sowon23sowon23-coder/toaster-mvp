@@ -8,7 +8,6 @@ type RenderOptions = {
   stickers: StickerItem[];
   textLine: string;
   textFont: FontConfig;
-  frameSrc: string;
   watermarkSrc: string;
   width?: number;
   height?: number;
@@ -48,7 +47,7 @@ function getTemplateLayout(templateId: string): TemplateLayout {
       panelBorderWidth: 10,
       panelFill: "#E9E1D7",
       panelBorder: "#D75A8E",
-      slotLeft: 45,
+      slotLeft: 36,
       slotTop: 27,
       slotWidth: 408,
       slotHeight: 308,
@@ -68,7 +67,7 @@ function getTemplateLayout(templateId: string): TemplateLayout {
     panelBorderWidth: 0,
     panelFill: "",
     panelBorder: "",
-    slotLeft: 45,
+    slotLeft: 36,
     slotTop: 27,
     slotWidth: 408,
     slotHeight: 308,
@@ -144,10 +143,8 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
   const scaleY = height / OUTPUT_HEIGHT;
   const layout = getTemplateLayout(options.template.id);
 
-  if (options.template.id !== "signature") {
-    ctx.fillStyle = options.template.background;
-    ctx.fillRect(0, 0, width, height);
-  }
+  ctx.fillStyle = options.template.background;
+  ctx.fillRect(0, 0, width, height);
 
   if (options.template.id === "signature") {
     const backdropX = Math.round(layout.backdropInsetX * scaleX);
@@ -248,17 +245,6 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#5f2e51";
     ctx.fillText(options.textLine.trim(), width / 2, height - Math.round(18 * scaleY));
-  }
-
-  if (options.template.id !== "signature") {
-    try {
-      const frameImage = await loadImage(options.frameSrc);
-      ctx.drawImage(frameImage, 0, 0, width, height);
-    } catch {
-      ctx.strokeStyle = "rgba(232, 83, 137, 0.7)";
-      ctx.lineWidth = Math.round(18 * scaleX);
-      ctx.strokeRect(0, 0, width, height);
-    }
   }
 
   try {

@@ -28,21 +28,21 @@ export const TEMPLATES: TemplateConfig[] = [
     name: "Signature Cream",
     description: "Warm and creamy look with a classic signature mood.",
     frameSrc: "/frames/signature.png",
-    background: "#FFFFFF",
+    background: "#D75A8E",
   },
   {
     id: "sprinkle",
     name: "Sprinkle Pop",
     description: "Bright pop colors for playful campaign shots.",
     frameSrc: "/frames/sprinkle.png",
-    background: "#FFF2FA",
+    background: "#C03DCC",
   },
   {
     id: "minimal",
     name: "Minimal Mood",
     description: "Simple clean style that keeps faces in focus.",
     frameSrc: "/frames/minimal.png",
-    background: "#FFFFFF",
+    background: "#74668C",
   },
 ];
 
