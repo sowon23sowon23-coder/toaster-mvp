@@ -68,7 +68,7 @@ export default function Edit() {
         photos,
         template,
         filter,
-        stickers,
+        stickers: [],
         textLine: "",
         textFont: font,
         watermarkSrc: "/brand/yogurtland_mark.png",
@@ -114,16 +114,6 @@ export default function Edit() {
       </div>
 
       <div className="edit-workspace">
-        <div className="edit-preview-wrap">
-          <StickerCanvasOverlay
-            previewSrc={previewUrl}
-            stickers={stickers}
-            selectedStickerId={selectedStickerId}
-            onSelectSticker={setSelectedStickerId}
-            onTransformSticker={(id, updates) => transformSticker(id, updates)}
-          />
-        </div>
-
         <div className="edit-controls">
           <div className="edit-tab-bar" role="tablist">
             {(["filter", "sticker"] as EditTab[]).map((tab) => (
@@ -203,11 +193,21 @@ export default function Edit() {
               </section>
             )}
           </div>
-        </div>
-      </div>
 
-      <div className="edit-bottom-cta">
-        <Button onClick={() => navigate("/preview")}>Next: Preview</Button>
+          <div className="edit-actions">
+            <Button onClick={() => navigate("/preview")}>Next: Preview</Button>
+          </div>
+        </div>
+
+        <div className="edit-preview-wrap">
+          <StickerCanvasOverlay
+            previewSrc={previewUrl}
+            stickers={stickers}
+            selectedStickerId={selectedStickerId}
+            onSelectSticker={setSelectedStickerId}
+            onTransformSticker={(id, updates) => transformSticker(id, updates)}
+          />
+        </div>
       </div>
     </main>
   );

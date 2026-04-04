@@ -41,7 +41,7 @@ function getTemplateLayout(templateId: string): TemplateLayout {
       slotHeight: 308,
       slotGap: 11,
       watermarkWidth: 96,
-      watermarkBottom: 12,
+      watermarkBottom: 22,
     };
   }
 
@@ -55,7 +55,7 @@ function getTemplateLayout(templateId: string): TemplateLayout {
     slotHeight: 308,
     slotGap: 11,
     watermarkWidth: 96,
-    watermarkBottom: 12,
+    watermarkBottom: 22,
   };
 }
 
