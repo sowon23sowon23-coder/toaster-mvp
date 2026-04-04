@@ -270,12 +270,12 @@ export default function Preview() {
             {saveMessage}
           </div>
         )}
+        <p className="preview-save-hint">Long press the image to save it.</p>
       </div>
 
       {saveOverlayUrl && (
         <div className="save-sheet-backdrop" onClick={closeSaveOverlay}>
           <div className="save-sheet" onClick={(e) => e.stopPropagation()}>
-            <div className="save-sheet-handle" />
             <div className="save-sheet-header">
               <span className="save-sheet-title">Save your photo</span>
               <button
@@ -288,7 +288,7 @@ export default function Preview() {
               </button>
             </div>
             <p className="save-sheet-hint">
-              <strong>Long-press</strong> the image to save it to your gallery
+              <strong>Long press to save.</strong> Press and hold the full image below.
             </p>
             <div className="save-sheet-img-wrap">
               <img src={saveOverlayUrl} alt="Save this image" className="save-sheet-img" />
