@@ -1,5 +1,6 @@
 export type AnalyticsEvent =
   | "start_clicked"
+  | "install_prompt_accepted"
   | "template_selected"
   | "capture_completed"
   | "capture_skipped"
