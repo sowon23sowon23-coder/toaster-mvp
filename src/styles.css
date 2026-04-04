@@ -583,7 +583,21 @@ body {
   box-shadow: 0 4px 12px rgba(230, 60, 131, 0.32);
 }
 
-.edit-tab-icon { font-size: 1.1rem; line-height: 1; }
+.edit-tab-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.edit-tab-icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
 
 .edit-tab-label {
   font-size: 0.64rem;
@@ -592,7 +606,8 @@ body {
   letter-spacing: 0.02em;
 }
 
-.edit-tab-btn.active .edit-tab-label { color: #fff; }
+.edit-tab-btn.active .edit-tab-label,
+.edit-tab-btn.active .edit-tab-icon { color: #fff; }
 
 .edit-panel-scroll {
   min-height: 0;

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import StickerCanvasOverlay from "../components/StickerCanvasOverlay";
@@ -16,9 +16,26 @@ const FILTER_SWATCHES: Record<string, string> = {
   mono: "linear-gradient(135deg, #d1d5db, #9ca3af, #6b7280)",
 };
 
-const TAB_ICONS: Record<EditTab, string> = {
-  filter: "FX",
-  sticker: "ST",
+const TAB_ICONS: Record<EditTab, ReactNode> = {
+  filter: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M4 6h16M7 12h10M10 18h4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  sticker: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M12 3l1.8 3.8L18 8.5l-3.2 2.9.8 4.2L12 13.7 8.4 15.6l.8-4.2L6 8.5l4.2-1.7L12 3z"
+        fill="currentColor"
+      />
+    </svg>
+  ),
 };
 
 export default function Edit() {
