@@ -597,10 +597,12 @@ body {
 .edit-panel-scroll {
   min-height: 0;
   flex: 1;
+  overflow-y: auto;
+  padding-right: 2px;
 }
 
 .edit-panel {
-  height: 100%;
+  min-height: 100%;
   margin-top: 0 !important;
   padding: 12px;
 }
@@ -616,6 +618,8 @@ body {
 
 .edit-actions {
   flex-shrink: 0;
+  margin-top: auto;
+  padding-top: 2px;
 }
 
 /* Filter grid */
@@ -933,15 +937,6 @@ body {
   border: 1px solid #a3e6c0;
   border-radius: 999px;
   padding: 6px 14px;
-}
-
-.preview-save-hint {
-  margin-top: 8px;
-  text-align: center;
-  font-size: 0.76rem;
-  line-height: 1.4;
-  color: var(--muted);
-  font-weight: 700;
 }
 
 /* Save button label with icon */

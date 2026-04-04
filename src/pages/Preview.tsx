@@ -270,7 +270,6 @@ export default function Preview() {
             {saveMessage}
           </div>
         )}
-        <p className="preview-save-hint">Long press the image to save it.</p>
       </div>
 
       {saveOverlayUrl && (
