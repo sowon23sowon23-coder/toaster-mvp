@@ -183,21 +183,31 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
   ctx.filter = "none";
 
   for (const sticker of options.stickers) {
-    const stickerSize = sticker.scale * width;
+    const stickerWidth = sticker.scale * width;
     const stickerX = sticker.x * width;
     const stickerY = sticker.y * height;
 
     try {
       const image = await loadImage(sticker.src);
+      const imageWidth = image.naturalWidth || image.width || 1;
+      const imageHeight = image.naturalHeight || image.height || 1;
+      const stickerHeight = stickerWidth * (imageHeight / imageWidth);
+
       ctx.save();
       ctx.translate(stickerX, stickerY);
       ctx.rotate((sticker.rotation * Math.PI) / 180);
-      ctx.drawImage(image, -stickerSize / 2, -stickerSize / 2, stickerSize, stickerSize);
+      ctx.drawImage(
+        image,
+        -stickerWidth / 2,
+        -stickerHeight / 2,
+        stickerWidth,
+        stickerHeight,
+      );
       ctx.restore();
     } catch {
       ctx.fillStyle = "#ff6aa2";
       ctx.beginPath();
-      ctx.arc(stickerX, stickerY, stickerSize / 2, 0, Math.PI * 2);
+      ctx.arc(stickerX, stickerY, stickerWidth / 2, 0, Math.PI * 2);
       ctx.fill();
     }
   }
