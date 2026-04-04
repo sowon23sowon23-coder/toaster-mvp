@@ -88,7 +88,6 @@ export default function Capture() {
 
   return (
     <main className="capture-page">
-      {/* Header */}
       <div className="capture-header">
         <button
           className="capture-back-btn"
@@ -96,7 +95,7 @@ export default function Capture() {
           onClick={() => navigate("/")}
           aria-label="Back"
         >
-          ←
+          {"<"}
         </button>
 
         <span className="capture-header-title">
@@ -115,7 +114,6 @@ export default function Capture() {
         </div>
       </div>
 
-      {/* Camera */}
       <div className="capture-camera-wrap">
         <div className="capture-stage">
           <video ref={videoRef} autoPlay muted playsInline />
@@ -125,7 +123,7 @@ export default function Capture() {
         {!cameraReady && !permissionError && (
           <div className="capture-mask">
             <div className="capture-mask-text">
-              <span className="capture-mask-icon">📷</span>
+              <span className="capture-mask-icon">CAM</span>
               <p className="capture-mask-label">Allow camera access to continue</p>
             </div>
           </div>
@@ -133,7 +131,9 @@ export default function Capture() {
 
         {countdown > 0 && (
           <div className="countdown-overlay">
-            <span key={countdown} className="countdown-number">{countdown}</span>
+            <span key={countdown} className="countdown-number">
+              {countdown}
+            </span>
           </div>
         )}
 
@@ -147,7 +147,6 @@ export default function Capture() {
         )}
       </div>
 
-      {/* Actions */}
       <div className="capture-actions">
         <Button
           variant="secondary"
@@ -159,18 +158,15 @@ export default function Capture() {
         >
           Retake
         </Button>
-        <Button
-          variant="secondary"
-          onClick={handleSkipShoot}
-          disabled={isCapturing}
-        >
+        <Button variant="secondary" onClick={handleSkipShoot} disabled={isCapturing}>
           Skip
         </Button>
         <Button
           onClick={() => void runCaptureSequence()}
           disabled={!cameraReady || isCapturing}
+          className="capture-start-btn"
         >
-          {isCapturing ? "Capturing..." : "Start Shoot →"}
+          {isCapturing ? "Capturing..." : "Start Shoot"}
         </Button>
       </div>
     </main>

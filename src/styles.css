@@ -256,6 +256,25 @@ body {
   box-shadow: var(--shadow-card);
 }
 
+.landing-install {
+  width: min(100%, 360px);
+  margin-top: 16px;
+  text-align: center;
+  display: grid;
+  gap: 10px;
+}
+
+.landing-install-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.landing-install-copy {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 .step-item {
   display: flex;
   flex-direction: column;
@@ -379,7 +398,7 @@ body {
 .capture-stage {
   position: relative;
   width: min(100%, 390px);
-  aspect-ratio: 408 / 308;
+  aspect-ratio: 4 / 5;
   border-radius: 18px;
   overflow: hidden;
   background: #160f15;
@@ -470,10 +489,14 @@ body {
 .capture-actions {
   flex-shrink: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr 1.6fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
   background: #0d0a10;
+}
+
+.capture-start-btn {
+  grid-column: 1 / -1;
 }
 
 /* ============================================================
@@ -495,8 +518,8 @@ body {
 
 .edit-workspace {
   display: grid;
-  grid-template-columns: minmax(128px, 142px) minmax(0, 1fr);
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
   align-items: start;
 }
 
@@ -504,7 +527,7 @@ body {
   flex-shrink: 0;
   margin-top: 12px;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: flex-start;
   height: auto;
   min-height: 0;
@@ -513,12 +536,13 @@ body {
 
 .edit-preview-wrap .preview-stage {
   aspect-ratio: 480 / 1367;
-  width: 100%;
+  width: min(100%, 240px);
   height: auto;
   max-width: 100%;
   margin: 0;
   background: transparent;
   border: 0;
+  box-shadow: 0 12px 36px rgba(100, 40, 80, 0.14);
 }
 
 .edit-controls {
@@ -881,9 +905,9 @@ body {
   align-items: center;
   justify-content: center;
   /* fill the available vertical space */
-  width: min(240px, 62vw);
+  width: min(280px, 72vw);
   min-height: 320px;
-  max-height: 68dvh;
+  max-height: 70dvh;
   height: auto;
   margin: 0 auto;
 }
@@ -1151,6 +1175,10 @@ body {
   .edit-screen, .preview-page, .bottom-cta,
   .edit-bottom-cta, .preview-bottom-cta {
     width: min(100%, 480px);
+  }
+
+  .capture-actions {
+    grid-template-columns: 1fr 1fr 1.6fr;
   }
 }
 

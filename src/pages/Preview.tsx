@@ -14,11 +14,15 @@ const isAndroidDevice = () => /Android/i.test(navigator.userAgent);
 
 const isRestrictedWebView = () => {
   const ua = navigator.userAgent;
-  // 알려진 인앱브라우저 UA 패턴
-  if (/KAKAOTALK|NAVER|NaverSearch|Instagram|FB_IAB|FBAN|Line\/|MicroMessenger|DaumApps|Slack|Teams|kakaotalk|twitter/i.test(ua)) return true;
-  // Android WebView 공통 신호: wv 플래그 또는 Version/x.x 없이 Chrome만 있는 경우
-  if (/Android/i.test(ua) && /wv\b/.test(ua)) return true;
-  return false;
+  if (
+    /KAKAOTALK|NAVER|NaverSearch|Instagram|FB_IAB|FBAN|Line\/|MicroMessenger|DaumApps|Slack|Teams|kakaotalk|twitter/i.test(
+      ua,
+    )
+  ) {
+    return true;
+  }
+
+  return /Android/i.test(ua) && /wv\b/.test(ua);
 };
 
 type SaveFilePickerWindow = Window & {
@@ -67,7 +71,6 @@ export default function Preview() {
     setFullResBlob(null);
 
     void (async () => {
-      // 프리뷰 렌더링
       const previewBlob = await renderPhotoboothImage({
         photos,
         template,
@@ -87,7 +90,6 @@ export default function Preview() {
         return url;
       });
 
-      // 고해상도 미리 렌더링 (클릭 즉시 다운로드 가능하도록)
       const highResBlob = await renderPhotoboothImage({
         photos,
         template,
@@ -138,9 +140,8 @@ export default function Preview() {
       });
 
       const filename = buildDownloadName();
-
-      // 1단계: 데스크톱 파일 피커 (Chrome/Edge desktop)
       const pickerWindow = window as SaveFilePickerWindow;
+
       if (pickerWindow.showSaveFilePicker && !isIosDevice() && !isAndroidDevice()) {
         try {
           const handle = await pickerWindow.showSaveFilePicker({
@@ -155,11 +156,9 @@ export default function Preview() {
           return;
         } catch (err) {
           if ((err as DOMException).name === "AbortError") return;
-          // 실패하면 다음 방법으로
         }
       }
 
-      // 2단계: Web Share API (iOS Safari 14.5+, Android Chrome, 일부 인앱브라우저)
       const file = new File([blob], filename, { type: "image/png" });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
@@ -169,11 +168,9 @@ export default function Preview() {
           return;
         } catch (err) {
           if ((err as DOMException).name === "AbortError") return;
-          // 실패하면 다음 방법으로
         }
       }
 
-      // 3단계: 카카오톡 등 Web Share 불가 인앱브라우저 → 오버레이 표시
       if (isRestrictedWebView() || isIosDevice()) {
         const dataUrl = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
@@ -182,11 +179,11 @@ export default function Preview() {
           reader.readAsDataURL(blob);
         });
         setSaveOverlayUrl(dataUrl);
+        setSaveMessage("If sharing is blocked, open this page in Safari or Chrome.");
         trackEvent("download_clicked");
         return;
       }
 
-      // 4단계: 데스크톱 앵커 다운로드 (Firefox 등)
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
@@ -216,7 +213,7 @@ export default function Preview() {
           onClick={() => navigate("/edit")}
           aria-label="Back"
         >
-          ←
+          {"<"}
         </button>
         <div className="page-header-text">
           <div className="page-header-title">Preview & Share</div>
@@ -236,12 +233,21 @@ export default function Preview() {
 
       <div className="preview-bottom-cta">
         <Button onClick={() => void handleDownload()} disabled={working || !fullResBlob}>
-          {working ? "Saving…" : !fullResBlob ? "Preparing…" : (
+          {working ? "Saving..." : !fullResBlob ? "Preparing..." : (
             <span className="btn-save-label">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
               Save Photo
             </span>
@@ -249,8 +255,17 @@ export default function Preview() {
         </Button>
         {saveMessage && (
           <div className="preview-save-toast">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12"/>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
             </svg>
             {saveMessage}
           </div>
@@ -263,7 +278,14 @@ export default function Preview() {
             <div className="save-sheet-handle" />
             <div className="save-sheet-header">
               <span className="save-sheet-title">Save your photo</span>
-              <button type="button" className="save-sheet-x" onClick={closeSaveOverlay} aria-label="Close">✕</button>
+              <button
+                type="button"
+                className="save-sheet-x"
+                onClick={closeSaveOverlay}
+                aria-label="Close"
+              >
+                x
+              </button>
             </div>
             <p className="save-sheet-hint">
               <strong>Long-press</strong> the image to save it to your gallery

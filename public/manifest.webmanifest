@@ -1,0 +1,25 @@
+{
+  "name": "Yogurtland Sweet Moment Booth",
+  "short_name": "Sweet Moment",
+  "description": "Capture, edit, and save a Yogurtland 4-cut photo booth strip.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fdf0f7",
+  "theme_color": "#e63c83",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/brand/logo_placeholder.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/logo_placeholder.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

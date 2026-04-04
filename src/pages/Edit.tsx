@@ -17,8 +17,8 @@ const FILTER_SWATCHES: Record<string, string> = {
 };
 
 const TAB_ICONS: Record<EditTab, string> = {
-  filter: "🎨",
-  sticker: "✨",
+  filter: "FX",
+  sticker: "ST",
 };
 
 export default function Edit() {
@@ -105,11 +105,11 @@ export default function Edit() {
           onClick={() => navigate("/capture")}
           aria-label="Back"
         >
-          ←
+          {"<"}
         </button>
         <div className="page-header-text">
           <div className="page-header-title">Edit Your Booth</div>
-          <div className="page-header-sub">Filter · Sticker</div>
+          <div className="page-header-sub">Choose a filter or place stickers</div>
         </div>
       </div>
 
@@ -157,7 +157,7 @@ export default function Edit() {
                       >
                         <div className="filter-swatch" style={{ background: FILTER_SWATCHES[item.id] }} />
                         <span className="filter-name">{item.name}</span>
-                        {isActive && <span className="filter-check">✓</span>}
+                        {isActive && <span className="filter-check">OK</span>}
                       </button>
                     );
                   })}
@@ -207,7 +207,7 @@ export default function Edit() {
       </div>
 
       <div className="edit-bottom-cta">
-        <Button onClick={() => navigate("/preview")}>Next: Preview →</Button>
+        <Button onClick={() => navigate("/preview")}>Next: Preview</Button>
       </div>
     </main>
   );
