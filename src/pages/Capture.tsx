@@ -21,6 +21,7 @@ export default function Capture() {
   const [countdown, setCountdown] = useState(0);
   const [captureIndex, setCaptureIndex] = useState(0);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [showFlash, setShowFlash] = useState(false);
 
   useEffect(() => {
     void requestCamera();
@@ -61,8 +62,10 @@ export default function Capture() {
         setCountdown(0);
         const blob = await captureVideoFrame(videoRef.current);
         captured.push(blob);
+        setShowFlash(true);
         setCaptureIndex(shot);
         await wait(260);
+        setShowFlash(false);
       }
 
       setPhotos(captured);
@@ -95,7 +98,9 @@ export default function Capture() {
           onClick={() => navigate("/")}
           aria-label="Back"
         >
-          {"<"}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
         </button>
 
         <span className="capture-header-title">
@@ -118,12 +123,18 @@ export default function Capture() {
         <div className="capture-stage">
           <video ref={videoRef} autoPlay muted playsInline />
           <div className="capture-shot-frame" aria-hidden="true" />
+          {showFlash && <div className="capture-flash" aria-hidden="true" />}
         </div>
 
         {!cameraReady && !permissionError && (
           <div className="capture-mask">
             <div className="capture-mask-text">
-              <span className="capture-mask-icon">CAM</span>
+              <span className="capture-mask-icon">
+                <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+              </span>
               <p className="capture-mask-label">Allow camera access to continue</p>
             </div>
           </div>

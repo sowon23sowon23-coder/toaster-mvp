@@ -122,7 +122,9 @@ export default function Edit() {
           onClick={() => navigate("/capture")}
           aria-label="Back"
         >
-          {"<"}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
         </button>
         <div className="page-header-text">
           <div className="page-header-title">Edit Your Booth</div>
@@ -164,7 +166,13 @@ export default function Edit() {
                       >
                         <div className="filter-swatch" style={{ background: FILTER_SWATCHES[item.id] }} />
                         <span className="filter-name">{item.name}</span>
-                        {isActive && <span className="filter-check">OK</span>}
+                        {isActive && (
+                          <span className="filter-check" aria-label="Selected">
+                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          </span>
+                        )}
                       </button>
                     );
                   })}
@@ -199,7 +207,13 @@ export default function Edit() {
                           setSelectedStickerId(null);
                         }}
                       >
-                        Delete
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                          </svg>
+                          Remove
+                        </span>
                       </button>
                     </div>
                     <p className="gesture-hint">

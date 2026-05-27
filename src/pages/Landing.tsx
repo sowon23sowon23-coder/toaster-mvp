@@ -66,17 +66,44 @@ export default function Landing() {
 
         <div className="landing-steps" aria-label="Capture, edit, and share">
           <div className="step-item">
-            <span className="step-icon">1</span>
+            <span className="step-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+            </span>
             <span className="step-label">Capture</span>
           </div>
-          <span className="step-arrow">-&gt;</span>
+          <span className="step-arrow" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </span>
           <div className="step-item">
-            <span className="step-icon">2</span>
+            <span className="step-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 2l2.4 4.8L20 8.5l-4 3.9 1 5.5-5-2.6-5 2.6 1-5.5-4-3.9 5.6-1.7L12 2z" />
+              </svg>
+            </span>
             <span className="step-label">Edit</span>
           </div>
-          <span className="step-arrow">-&gt;</span>
+          <span className="step-arrow" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </span>
           <div className="step-item">
-            <span className="step-icon">3</span>
+            <span className="step-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="18" cy="5" r="3" />
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="18" cy="19" r="3" />
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+              </svg>
+            </span>
             <span className="step-label">Share</span>
           </div>
         </div>
@@ -95,7 +122,15 @@ export default function Landing() {
       </div>
 
       <div className="landing-cta">
-        <Button onClick={handleStart}>Start Campaign</Button>
+        <Button onClick={handleStart}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+            Start Sweet Moment
+          </span>
+        </Button>
       </div>
     </main>
   );

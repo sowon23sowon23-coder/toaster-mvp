@@ -213,7 +213,9 @@ export default function Preview() {
           onClick={() => navigate("/edit")}
           aria-label="Back"
         >
-          {"<"}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
         </button>
         <div className="page-header-text">
           <div className="page-header-title">Preview & Share</div>
@@ -283,7 +285,10 @@ export default function Preview() {
                 onClick={closeSaveOverlay}
                 aria-label="Close"
               >
-                x
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
               </button>
             </div>
             <p className="save-sheet-hint">

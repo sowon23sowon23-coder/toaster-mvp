@@ -33,7 +33,7 @@ h1, h2, h3 { margin: 0; }
 body {
   background: linear-gradient(160deg, #fce4f3 0%, #f5e8ff 40%, #ffe8f0 100%) fixed;
   color: var(--text);
-  font-family: "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
+  font-family: var(--font-brand);
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
 }
@@ -283,22 +283,30 @@ body {
 }
 
 .step-icon {
-  font-size: 1.4rem;
-  line-height: 1;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(230, 60, 131, 0.12), rgba(155, 39, 175, 0.1));
+  border-radius: 10px;
+  color: var(--primary);
 }
 
 .step-label {
   font-size: 0.68rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--muted);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
+  margin-top: 4px;
 }
 
 .step-arrow {
-  font-size: 0.85rem;
   color: var(--primary);
-  font-weight: 800;
   flex-shrink: 0;
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
 }
 
 .landing-cta {
@@ -365,21 +373,22 @@ body {
 }
 
 .capture-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  width: 16px;
+  height: 5px;
+  border-radius: 3px;
   background: rgba(255,255,255,0.25);
-  transition: background 0.2s, transform 0.2s;
+  transition: background 0.22s, width 0.22s, box-shadow 0.22s;
 }
 
 .capture-dot.done {
   background: var(--primary);
-  transform: scale(1.15);
+  width: 22px;
 }
 
 .capture-dot.current {
   background: #fff;
-  box-shadow: 0 0 0 2px rgba(230, 60, 131, 0.5);
+  width: 22px;
+  box-shadow: 0 0 0 2px rgba(230, 60, 131, 0.45);
 }
 
 .capture-camera-wrap {
@@ -415,9 +424,9 @@ body {
 .capture-shot-frame {
   position: absolute;
   inset: 0;
-  border: 10px solid rgba(255, 255, 255, 0.92);
+  border: 3px solid rgba(255, 255, 255, 0.7);
   border-radius: 18px;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
   pointer-events: none;
 }
 
@@ -437,9 +446,11 @@ body {
 }
 
 .capture-mask-icon {
-  font-size: 2.5rem;
-  display: block;
-  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  opacity: 0.85;
 }
 
 .capture-mask-label {
@@ -475,8 +486,9 @@ body {
 .countdown-number {
   font-size: 7rem;
   font-weight: 900;
+  font-family: var(--font-brand);
   color: #fff;
-  text-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  text-shadow: 0 4px 32px rgba(230, 60, 131, 0.5), 0 2px 12px rgba(0,0,0,0.4);
   line-height: 1;
   animation: countdown-pop 0.3s ease;
 }
@@ -484,6 +496,21 @@ body {
 @keyframes countdown-pop {
   from { transform: scale(1.4); opacity: 0.5; }
   to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes flash-capture {
+  0%   { opacity: 0.88; }
+  100% { opacity: 0; }
+}
+
+.capture-flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  border-radius: 18px;
+  pointer-events: none;
+  z-index: 10;
+  animation: flash-capture 0.3s ease-out forwards;
 }
 
 .capture-actions {
@@ -684,11 +711,16 @@ body {
 
 .filter-check {
   position: absolute;
-  top: 3px;
+  top: 4px;
   right: 5px;
-  font-size: 0.6rem;
   color: var(--primary);
-  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: rgba(230, 60, 131, 0.1);
+  border-radius: 50%;
 }
 
 /* Sticker grid */
@@ -874,8 +906,7 @@ body {
 .sticker img { width: 100%; display: block; }
 
 .sticker.selected img {
-  outline: 2px dashed var(--primary);
-  border-radius: 10px;
+  filter: drop-shadow(0 0 8px rgba(230, 60, 131, 0.75)) drop-shadow(0 0 2px rgba(230, 60, 131, 0.4));
 }
 
 /* ============================================================
@@ -911,11 +942,11 @@ body {
   border: 1px solid var(--line);
   aspect-ratio: 480 / 1367;
   background: #f0eaf2;
-  box-shadow: 0 12px 40px rgba(100, 40, 80, 0.18), 0 2px 8px rgba(100, 40, 80, 0.10);
+  box-shadow: 0 16px 48px rgba(100, 40, 80, 0.22), 0 4px 12px rgba(100, 40, 80, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: min(232px, 58vw);
+  width: min(270px, 68vw);
   height: min(100%, 100%);
   max-height: 100%;
   margin: 0 auto;
