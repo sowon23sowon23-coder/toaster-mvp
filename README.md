@@ -86,7 +86,7 @@ Expected frame size: `1080x1350` transparent PNG.
 - Camera requires HTTPS or localhost.
 - User gesture may be required before camera playback on some iOS versions.
 - Clipboard API may be restricted in private mode; fallback uses `execCommand`.
-- `ctx.filter` support can vary by iOS version; filters are implemented with Canvas 2D filter and may render slightly differently by browser.
+- Filters are rendered with app-side pixel processing instead of `ctx.filter`, so the same filter path is used across Safari, Chrome, and in-app webviews.
 
 ## MVP Scope Notes
 - No backend persistence.

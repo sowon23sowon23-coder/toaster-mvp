@@ -13,7 +13,13 @@ export type TemplateConfig = {
 export type FilterConfig = {
   id: FilterId;
   name: string;
-  canvasFilter: string;
+  adjustments: {
+    brightness?: number;
+    saturation?: number;
+    contrast?: number;
+    hueRotate?: number;
+    grayscale?: number;
+  };
 };
 
 export type FontConfig = {
@@ -47,11 +53,27 @@ export const TEMPLATES: TemplateConfig[] = [
 ];
 
 export const FILTERS: FilterConfig[] = [
-  { id: "none", name: "Original", canvasFilter: "none" },
-  { id: "soft", name: "Soft Cream", canvasFilter: "brightness(1.06) saturate(0.9) contrast(0.94)" },
-  { id: "vivid", name: "Pop Berry", canvasFilter: "brightness(1.04) saturate(1.22) contrast(1.08)" },
-  { id: "cool", name: "Mint Cool", canvasFilter: "brightness(1.02) saturate(0.85) hue-rotate(8deg)" },
-  { id: "mono", name: "Classic Mono", canvasFilter: "grayscale(1) contrast(1.06)" },
+  { id: "none", name: "Original", adjustments: {} },
+  {
+    id: "soft",
+    name: "Soft Cream",
+    adjustments: { brightness: 1.06, saturation: 0.9, contrast: 0.94 },
+  },
+  {
+    id: "vivid",
+    name: "Pop Berry",
+    adjustments: { brightness: 1.04, saturation: 1.22, contrast: 1.08 },
+  },
+  {
+    id: "cool",
+    name: "Mint Cool",
+    adjustments: { brightness: 1.02, saturation: 0.85, hueRotate: 8 },
+  },
+  {
+    id: "mono",
+    name: "Classic Mono",
+    adjustments: { grayscale: 1, contrast: 1.06 },
+  },
 ];
 
 export const FONTS: FontConfig[] = [

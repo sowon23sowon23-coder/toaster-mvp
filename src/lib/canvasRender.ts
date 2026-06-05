@@ -112,6 +112,122 @@ function drawCover(
   ctx.drawImage(image, dx, dy, drawWidth, drawHeight);
 }
 
+function clampChannel(value: number) {
+  return Math.min(255, Math.max(0, value));
+}
+
+function rotateHue(r: number, g: number, b: number, degrees: number) {
+  const angle = (degrees * Math.PI) / 180;
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+
+  return {
+    r:
+      (0.213 + cos * 0.787 - sin * 0.213) * r
+      + (0.715 - cos * 0.715 - sin * 0.715) * g
+      + (0.072 - cos * 0.072 + sin * 0.928) * b,
+    g:
+      (0.213 - cos * 0.213 + sin * 0.143) * r
+      + (0.715 + cos * 0.285 + sin * 0.14) * g
+      + (0.072 - cos * 0.072 - sin * 0.283) * b,
+    b:
+      (0.213 - cos * 0.213 - sin * 0.787) * r
+      + (0.715 - cos * 0.715 + sin * 0.715) * g
+      + (0.072 + cos * 0.928 + sin * 0.072) * b,
+  };
+}
+
+function applyFilterAdjustments(
+  imageData: ImageData,
+  adjustments: FilterConfig["adjustments"],
+) {
+  const {
+    brightness = 1,
+    saturation = 1,
+    contrast = 1,
+    hueRotate = 0,
+    grayscale = 0,
+  } = adjustments;
+  const { data } = imageData;
+
+  for (let i = 0; i < data.length; i += 4) {
+    let r = data[i];
+    let g = data[i + 1];
+    let b = data[i + 2];
+
+    if (brightness !== 1) {
+      r *= brightness;
+      g *= brightness;
+      b *= brightness;
+    }
+
+    if (saturation !== 1) {
+      const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      r = luma + (r - luma) * saturation;
+      g = luma + (g - luma) * saturation;
+      b = luma + (b - luma) * saturation;
+    }
+
+    if (hueRotate !== 0) {
+      const rotated = rotateHue(r, g, b, hueRotate);
+      r = rotated.r;
+      g = rotated.g;
+      b = rotated.b;
+    }
+
+    if (grayscale > 0) {
+      const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      r = r * (1 - grayscale) + luma * grayscale;
+      g = g * (1 - grayscale) + luma * grayscale;
+      b = b * (1 - grayscale) + luma * grayscale;
+    }
+
+    if (contrast !== 1) {
+      r = (r - 128) * contrast + 128;
+      g = (g - 128) * contrast + 128;
+      b = (b - 128) * contrast + 128;
+    }
+
+    data[i] = clampChannel(r);
+    data[i + 1] = clampChannel(g);
+    data[i + 2] = clampChannel(b);
+  }
+}
+
+function drawFilteredCover(
+  ctx: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  filter: FilterConfig,
+) {
+  const buffer = document.createElement("canvas");
+  buffer.width = width;
+  buffer.height = height;
+  const bufferCtx = buffer.getContext("2d", { willReadFrequently: true });
+  if (!bufferCtx) {
+    drawCover(ctx, image, x, y, width, height);
+    return;
+  }
+
+  drawCover(bufferCtx, image, 0, 0, width, height);
+
+  if (filter.id !== "none") {
+    try {
+      const imageData = bufferCtx.getImageData(0, 0, width, height);
+      applyFilterAdjustments(imageData, filter.adjustments);
+      bufferCtx.putImageData(imageData, 0, 0);
+    } catch {
+      // Some mobile browsers block getImageData (canvas taint / privacy restrictions).
+      // Fall through — buffer already holds the unfiltered image.
+    }
+  }
+
+  ctx.drawImage(buffer, x, y, width, height);
+}
+
 export async function renderPhotoboothImage(options: RenderOptions): Promise<Blob> {
   const width = options.width ?? OUTPUT_WIDTH;
   const height = options.height ?? OUTPUT_HEIGHT;
@@ -153,7 +269,6 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
     gap: Math.round(layout.slotGap * scaleY),
   };
 
-  ctx.filter = options.filter.canvasFilter;
   for (let i = 0; i < 4; i += 1) {
     const photo = options.photos[i];
     const y = slot.top + i * (slot.height + slot.gap);
@@ -162,17 +277,18 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
     ctx.fillRect(slot.left, y, slot.width, slot.height);
 
     if (photo) {
+      ctx.save();
       try {
         const image = await loadImageFromBlob(photo);
-        ctx.save();
         ctx.beginPath();
         ctx.rect(slot.left, y, slot.width, slot.height);
         ctx.clip();
-        drawCover(ctx, image, slot.left, y, slot.width, slot.height);
-        ctx.restore();
+        drawFilteredCover(ctx, image, slot.left, y, slot.width, slot.height, options.filter);
       } catch {
         ctx.fillStyle = "#DDD";
         ctx.fillRect(slot.left, y, slot.width, slot.height);
+      } finally {
+        ctx.restore();
       }
     }
 
@@ -180,7 +296,6 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
     ctx.lineWidth = Math.max(2, Math.round(3 * scaleX));
     ctx.strokeRect(slot.left, y, slot.width, slot.height);
   }
-  ctx.filter = "none";
 
   for (const sticker of options.stickers) {
     const stickerWidth = sticker.scale * width;
