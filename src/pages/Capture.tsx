@@ -12,6 +12,7 @@ export default function Capture() {
   const navigate = useNavigate();
   const setPhotos = usePhotoboothStore((state) => state.setPhotos);
   const resetPhotos = usePhotoboothStore((state) => state.resetPhotos);
+  const resetEdit = usePhotoboothStore((state) => state.resetEdit);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -69,6 +70,7 @@ export default function Capture() {
       }
 
       setPhotos(captured);
+      resetEdit();
       trackEvent("capture_completed");
       navigate("/edit");
     } catch (error) {
@@ -85,6 +87,7 @@ export default function Capture() {
     streamRef.current = null;
     resetPhotos();
     setPhotos(SKIPPED_PHOTOS);
+    resetEdit();
     trackEvent("capture_skipped");
     navigate("/edit");
   }

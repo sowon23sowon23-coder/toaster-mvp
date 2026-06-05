@@ -103,7 +103,7 @@ export default function Edit() {
     return () => {
       canceled = true;
     };
-  }, [template, photos, filter, stickers, font]);
+  }, [template, photos, filter, font]);
 
   useEffect(() => {
     return () => {
