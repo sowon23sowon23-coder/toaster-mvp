@@ -1185,19 +1185,61 @@ body {
   aspect-ratio: 4 / 5; display: grid; place-items: center;
 }
 .ig-shell img { width: 100%; height: 100%; object-fit: cover; }
-.template-grid { margin-top: 12px; display: grid; gap: 10px; }
+.template-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
 .template-card {
-  width: 100%; text-align: left; border-radius: var(--r-lg);
-  border: 1px solid var(--line); background: #fff; padding: 10px; cursor: pointer;
+  position: relative;
+  width: 100%;
+  text-align: center;
+  border-radius: var(--r-lg);
+  border: 2.5px solid transparent;
+  background: var(--panel);
+  padding: 8px 8px 10px;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
 }
-.template-card.selected { border-color: #cf3f87; box-shadow: inset 0 0 0 1px #cf3f87; }
-.template-card h3 { margin: 10px 0 4px; }
-.template-card p { color: var(--muted); font-size: 0.86rem; }
+.template-card:active { transform: scale(0.97); }
+.template-card.selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary), var(--shadow-card);
+}
 .template-preview {
-  border-radius: var(--r-sm); overflow: hidden;
-  border: 1px solid var(--line); aspect-ratio: 480 / 1367; background: #f7f2f4;
+  position: relative;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  aspect-ratio: 483 / 1376;
+  background: #f0eaf4;
 }
-.template-preview img { width: 100%; height: 100%; object-fit: cover; }
+.template-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.template-check-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+.template-name {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 /* ============================================================
    RESPONSIVE (tablet+)
