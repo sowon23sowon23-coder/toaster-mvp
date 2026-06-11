@@ -64,7 +64,7 @@ export default function Landing() {
           and share it on Instagram
         </p>
 
-        <div className="landing-steps" aria-label="Capture, edit, and share">
+        <div className="landing-steps" aria-label="Capture, customize, and share">
           <div className="step-item">
             <span className="step-icon">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -83,10 +83,11 @@ export default function Landing() {
           <div className="step-item">
             <span className="step-icon">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M12 2l2.4 4.8L20 8.5l-4 3.9 1 5.5-5-2.6-5 2.6 1-5.5-4-3.9 5.6-1.7L12 2z" />
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <rect x="7" y="7" width="10" height="10" rx="1" fill="currentColor" opacity="0.4" stroke="none" />
               </svg>
             </span>
-            <span className="step-label">Edit</span>
+            <span className="step-label">Customize</span>
           </div>
           <span className="step-arrow" aria-hidden="true">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

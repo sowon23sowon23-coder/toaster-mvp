@@ -98,8 +98,8 @@ export default function Preview() {
         textLine,
         textFont: font,
         watermarkSrc: "/brand/yogurtland_mark.png",
-        width: 480,
-        height: 1367,
+        width: 483,
+        height: 1376,
       });
 
       if (canceled) return;

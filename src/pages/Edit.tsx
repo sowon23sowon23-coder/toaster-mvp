@@ -47,7 +47,7 @@ const TAB_ICONS: Record<EditTab, ReactNode> = {
 
 export default function Edit() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<EditTab>("filter");
+  const [activeTab, setActiveTab] = useState<EditTab>("frame");
   const [selectedStickerId, setSelectedStickerId] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -136,7 +136,7 @@ export default function Edit() {
         </button>
         <div className="page-header-text">
           <div className="page-header-title">Edit Your Booth</div>
-          <div className="page-header-sub">Choose a filter or place stickers</div>
+          <div className="page-header-sub">Choose a frame, filter, or stickers</div>
         </div>
       </div>
 
