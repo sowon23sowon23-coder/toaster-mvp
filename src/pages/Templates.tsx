@@ -10,7 +10,6 @@ export default function Templates() {
   const navigate = useNavigate();
   const selectedTemplateId = usePhotoboothStore((state) => state.selectedTemplateId);
   const setTemplate = usePhotoboothStore((state) => state.setTemplate);
-  const resetPhotos = usePhotoboothStore((state) => state.resetPhotos);
   const resetEdit = usePhotoboothStore((state) => state.resetEdit);
 
   function handleSelect(id: TemplateId) {
@@ -19,14 +18,13 @@ export default function Templates() {
   }
 
   function handleContinue() {
-    resetPhotos();
     resetEdit();
-    navigate("/capture");
+    navigate("/edit");
   }
 
   return (
     <main className="screen">
-      <Header title="Choose Frame" subtitle="Pick a frame for your 4-cut." backTo="/" />
+      <Header title="Choose Frame" subtitle="Pick a frame for your 4-cut." backTo="/capture" />
 
       <section className="template-grid">
         {TEMPLATES.map((template) => (

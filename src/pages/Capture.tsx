@@ -72,7 +72,7 @@ export default function Capture() {
       setPhotos(captured);
       resetEdit();
       trackEvent("capture_completed");
-      navigate("/edit");
+      navigate("/templates");
     } catch (error) {
       setPermissionError(error instanceof Error ? error.message : "Capture failed.");
     } finally {
@@ -89,7 +89,7 @@ export default function Capture() {
     setPhotos(SKIPPED_PHOTOS);
     resetEdit();
     trackEvent("capture_skipped");
-    navigate("/edit");
+    navigate("/templates");
   }
 
   return (
