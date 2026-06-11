@@ -162,7 +162,7 @@ export default function Edit() {
             {activeTab === "frame" && (
               <section className="panel edit-panel">
                 <p className="edit-panel-hint">Tap to select a frame</p>
-                <div className="template-grid">
+                <div className="frame-row">
                   {TEMPLATES.map((tmpl) => (
                     <TemplateCard
                       key={tmpl.id}

@@ -1240,6 +1240,19 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.frame-row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.frame-row::-webkit-scrollbar { display: none; }
+.frame-row .template-card {
+  flex: 0 0 90px;
+  width: 90px;
+}
 
 /* ============================================================
    RESPONSIVE (tablet+)
