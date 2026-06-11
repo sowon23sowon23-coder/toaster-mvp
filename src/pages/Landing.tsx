@@ -37,7 +37,7 @@ export default function Landing() {
     trackEvent("start_clicked");
     resetPhotos();
     resetEdit();
-    navigate("/capture");
+    navigate("/templates");
   }
 
   async function handleInstall() {
