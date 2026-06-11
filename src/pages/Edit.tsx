@@ -2,11 +2,12 @@ import { ReactNode, useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import StickerCanvasOverlay from "../components/StickerCanvasOverlay";
-import { FILTERS, FONTS, STICKER_ASSETS, TEMPLATES } from "../lib/assets";
+import TemplateCard from "../components/TemplateCard";
+import { FILTERS, FONTS, STICKER_ASSETS, TEMPLATES, TemplateId } from "../lib/assets";
 import { renderPhotoboothImage } from "../lib/canvasRender";
 import { usePhotoboothStore } from "../store/usePhotoboothStore";
 
-type EditTab = "filter" | "sticker";
+type EditTab = "frame" | "filter" | "sticker";
 
 const FILTER_SWATCHES: Record<string, string> = {
   none: "linear-gradient(135deg, #f9c6d4, #fde8c0, #c8eafd)",
@@ -17,6 +18,12 @@ const FILTER_SWATCHES: Record<string, string> = {
 };
 
 const TAB_ICONS: Record<EditTab, ReactNode> = {
+  frame: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" strokeWidth="2.2" />
+      <rect x="7" y="7" width="10" height="10" rx="1" fill="currentColor" opacity="0.3" />
+    </svg>
+  ),
   filter: (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path
@@ -50,6 +57,7 @@ export default function Edit() {
   const stickers = usePhotoboothStore((state) => state.stickers);
   const textLine = usePhotoboothStore((state) => state.textLine);
   const textFont = usePhotoboothStore((state) => state.textFont);
+  const setTemplate = usePhotoboothStore((state) => state.setTemplate);
   const setFilter = usePhotoboothStore((state) => state.setFilter);
   const addSticker = usePhotoboothStore((state) => state.addSticker);
   const transformSticker = usePhotoboothStore((state) => state.transformSticker);
@@ -135,7 +143,7 @@ export default function Edit() {
       <div className="edit-workspace">
         <div className="edit-controls">
           <div className="edit-tab-bar" role="tablist">
-            {(["filter", "sticker"] as EditTab[]).map((tab) => (
+            {(["frame", "filter", "sticker"] as EditTab[]).map((tab) => (
               <button
                 key={tab}
                 type="button"
@@ -151,6 +159,22 @@ export default function Edit() {
           </div>
 
           <div className="edit-panel-scroll">
+            {activeTab === "frame" && (
+              <section className="panel edit-panel">
+                <p className="edit-panel-hint">Tap to select a frame</p>
+                <div className="template-grid">
+                  {TEMPLATES.map((tmpl) => (
+                    <TemplateCard
+                      key={tmpl.id}
+                      template={tmpl}
+                      selected={selectedTemplateId === tmpl.id}
+                      onSelect={(id: TemplateId) => setTemplate(id)}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
             {activeTab === "filter" && (
               <section className="panel edit-panel">
                 <p className="edit-panel-hint">Tap to apply a filter</p>
