@@ -26,8 +26,8 @@ type TemplateLayout = {
   watermarkBottom: number;
 };
 
-const OUTPUT_WIDTH = 480;
-const OUTPUT_HEIGHT = 1367;
+const OUTPUT_WIDTH = 483;
+const OUTPUT_HEIGHT = 1376;
 
 function getTemplateLayout(templateId: string): TemplateLayout {
   if (templateId === "signature") {
@@ -35,13 +35,28 @@ function getTemplateLayout(templateId: string): TemplateLayout {
       backdropInsetX: 12,
       backdropInsetY: 12,
       backdropRadius: 18,
-      slotLeft: 36,
-      slotTop: 27,
-      slotWidth: 408,
-      slotHeight: 308,
-      slotGap: 11,
+      slotLeft: 57,
+      slotTop: 168,
+      slotWidth: 369,
+      slotHeight: 234,
+      slotGap: 5,
       watermarkWidth: 96,
       watermarkBottom: 22,
+    };
+  }
+
+  if (templateId === "soccer") {
+    return {
+      backdropInsetX: 0,
+      backdropInsetY: 0,
+      backdropRadius: 0,
+      slotLeft: 57,
+      slotTop: 168,
+      slotWidth: 369,
+      slotHeight: 234,
+      slotGap: 5,
+      watermarkWidth: 0,
+      watermarkBottom: 0,
     };
   }
 
@@ -49,11 +64,11 @@ function getTemplateLayout(templateId: string): TemplateLayout {
     backdropInsetX: 0,
     backdropInsetY: 0,
     backdropRadius: 0,
-    slotLeft: 36,
-    slotTop: 27,
-    slotWidth: 408,
-    slotHeight: 308,
-    slotGap: 11,
+    slotLeft: 57,
+    slotTop: 168,
+    slotWidth: 369,
+    slotHeight: 234,
+    slotGap: 5,
     watermarkWidth: 96,
     watermarkBottom: 22,
   };
@@ -334,6 +349,15 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#5f2e51";
     ctx.fillText(options.textLine.trim(), width / 2, height - Math.round(18 * scaleY));
+  }
+
+  if (options.template.frameOverlay) {
+    try {
+      const frameImage = await loadImage(options.template.frameSrc);
+      ctx.drawImage(frameImage, 0, 0, width, height);
+    } catch {
+      // frame overlay load failed — skip silently
+    }
   }
 
   try {

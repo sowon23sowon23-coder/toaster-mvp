@@ -1,4 +1,4 @@
-export type TemplateId = "signature" | "sprinkle" | "minimal";
+export type TemplateId = "signature" | "sprinkle" | "minimal" | "soccer";
 export type FilterId = "none" | "soft" | "vivid" | "cool" | "mono";
 export type FontId = "sans" | "serif" | "mono";
 
@@ -8,6 +8,7 @@ export type TemplateConfig = {
   description: string;
   frameSrc: string;
   background: string;
+  frameOverlay?: boolean;
 };
 
 export type FilterConfig = {
@@ -49,6 +50,14 @@ export const TEMPLATES: TemplateConfig[] = [
     description: "Simple clean style that keeps faces in focus.",
     frameSrc: "/frames/minimal.png",
     background: "#74668C",
+  },
+  {
+    id: "soccer",
+    name: "Play Together",
+    description: "Soccer-themed frame for World Cup celebrations.",
+    frameSrc: "/frames/soccer.png",
+    background: "#0A1A5C",
+    frameOverlay: true,
   },
 ];
 
