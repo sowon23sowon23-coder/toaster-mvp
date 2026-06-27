@@ -60,36 +60,6 @@ function getTemplateLayout(templateId: string): TemplateLayout {
     };
   }
 
-  if (templateId === "toystory1" || templateId === "toystory2") {
-    return {
-      backdropInsetX: 0,
-      backdropInsetY: 0,
-      backdropRadius: 0,
-      slotLeft: 0,
-      slotTop: 166,
-      slotWidth: OUTPUT_WIDTH,
-      slotHeight: 233,
-      slotGap: 5,
-      watermarkWidth: 0,
-      watermarkBottom: 0,
-    };
-  }
-
-  if (templateId === "toystory3") {
-    return {
-      backdropInsetX: 0,
-      backdropInsetY: 0,
-      backdropRadius: 0,
-      slotLeft: 0,
-      slotTop: 182,
-      slotWidth: OUTPUT_WIDTH,
-      slotHeight: 233,
-      slotGap: 5,
-      watermarkWidth: 0,
-      watermarkBottom: 0,
-    };
-  }
-
   return {
     backdropInsetX: 0,
     backdropInsetY: 0,
@@ -337,11 +307,9 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
       }
     }
 
-    if (layout.slotLeft > 0) {
-      ctx.strokeStyle = "rgba(0,0,0,0.08)";
-      ctx.lineWidth = Math.max(2, Math.round(3 * scaleX));
-      ctx.strokeRect(slot.left, y, slot.width, slot.height);
-    }
+    ctx.strokeStyle = "rgba(0,0,0,0.08)";
+    ctx.lineWidth = Math.max(2, Math.round(3 * scaleX));
+    ctx.strokeRect(slot.left, y, slot.width, slot.height);
   }
 
   for (const sticker of options.stickers) {
