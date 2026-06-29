@@ -29,6 +29,14 @@ type TemplateLayout = {
 const OUTPUT_WIDTH = 483;
 const OUTPUT_HEIGHT = 1376;
 
+// The Toy Story sources include transparent horizontal padding around the
+// 483 x 1376 artwork. Crop the padding instead of squeezing the full image.
+const FRAME_CROP_LEFT: Partial<Record<TemplateConfig["id"], number>> = {
+  toystory1: 22,
+  toystory2: 32,
+  toystory3: 18,
+};
+
 function getTemplateLayout(templateId: string): TemplateLayout {
   if (templateId === "signature") {
     return {
@@ -354,7 +362,21 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
   if (options.template.frameOverlay) {
     try {
       const frameImage = await loadImage(options.template.frameSrc);
-      ctx.drawImage(frameImage, 0, 0, width, height);
+      const cropLeft = FRAME_CROP_LEFT[options.template.id] ?? 0;
+      const cropWidth = Math.min(OUTPUT_WIDTH, frameImage.naturalWidth - cropLeft);
+      const cropHeight = Math.min(OUTPUT_HEIGHT, frameImage.naturalHeight);
+
+      ctx.drawImage(
+        frameImage,
+        cropLeft,
+        0,
+        cropWidth,
+        cropHeight,
+        0,
+        0,
+        width,
+        height,
+      );
     } catch {
       // frame overlay load failed — skip silently
     }
