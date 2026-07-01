@@ -47,6 +47,21 @@ function getTemplateLayout(templateId: string): TemplateLayout {
     };
   }
 
+  if (templateId === "toystory1" || templateId === "toystory2" || templateId === "toystory3") {
+    return {
+      backdropInsetX: 0,
+      backdropInsetY: 0,
+      backdropRadius: 0,
+      slotLeft: 82,
+      slotTop: 168,
+      slotWidth: 350,
+      slotHeight: 234,
+      slotGap: 5,
+      watermarkWidth: 0,
+      watermarkBottom: 0,
+    };
+  }
+
   if (templateId === "soccer") {
     return {
       backdropInsetX: 0,
