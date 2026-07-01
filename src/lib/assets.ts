@@ -1,4 +1,4 @@
-export type TemplateId = "signature" | "sprinkle" | "minimal" | "soccer";
+export type TemplateId = "signature" | "toystory1" | "toystory2" | "toystory3" | "sprinkle" | "minimal" | "soccer";
 export type FilterId = "none" | "soft" | "vivid" | "cool" | "mono";
 export type FontId = "sans" | "serif" | "mono";
 
@@ -36,6 +36,30 @@ export const TEMPLATES: TemplateConfig[] = [
     description: "Warm and creamy look with a classic signature mood.",
     frameSrc: "/frames/signature.png",
     background: "#D75A8E",
+  },
+  {
+    id: "toystory1",
+    name: "Toy Story Frame 1",
+    description: "",
+    frameSrc: "/frames/toy-story-blue.png",
+    background: "transparent",
+    frameOverlay: true,
+  },
+  {
+    id: "toystory2",
+    name: "Toy Story Frame 2",
+    description: "",
+    frameSrc: "/frames/toy-story-green.png",
+    background: "transparent",
+    frameOverlay: true,
+  },
+  {
+    id: "toystory3",
+    name: "Toy Story Frame 3",
+    description: "",
+    frameSrc: "/frames/toy-story-skyblue.png",
+    background: "transparent",
+    frameOverlay: true,
   },
   {
     id: "sprinkle",
