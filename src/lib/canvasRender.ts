@@ -29,13 +29,7 @@ type TemplateLayout = {
 const OUTPUT_WIDTH = 483;
 const OUTPUT_HEIGHT = 1376;
 
-// The Toy Story sources include transparent horizontal padding around the
-// 483 x 1376 artwork. Crop the padding instead of squeezing the full image.
-const FRAME_CROP_LEFT: Partial<Record<TemplateConfig["id"], number>> = {
-  toystory1: 22,
-  toystory2: 32,
-  toystory3: 18,
-};
+const FRAME_CROP_LEFT: Partial<Record<TemplateConfig["id"], number>> = {};
 
 function getTemplateLayout(templateId: string): TemplateLayout {
   if (templateId === "signature") {
