@@ -1,4 +1,4 @@
-export type TemplateId = "signature" | "sprinkle" | "minimal" | "soccer" | "toystory1" | "toystory2" | "toystory3";
+export type TemplateId = "signature" | "sprinkle" | "minimal" | "soccer";
 export type FilterId = "none" | "soft" | "vivid" | "cool" | "mono";
 export type FontId = "sans" | "serif" | "mono";
 
@@ -57,30 +57,6 @@ export const TEMPLATES: TemplateConfig[] = [
     description: "Soccer-themed frame for World Cup celebrations.",
     frameSrc: "/frames/soccer.png",
     background: "#0A1A5C",
-    frameOverlay: true,
-  },
-  {
-    id: "toystory1",
-    name: "Toy Story 1",
-    description: "",
-    frameSrc: "/frames/toy-story-1.png",
-    background: "#1A3A6B",
-    frameOverlay: true,
-  },
-  {
-    id: "toystory2",
-    name: "Toy Story 2",
-    description: "",
-    frameSrc: "/frames/toy-story-2.png",
-    background: "#1A3A6B",
-    frameOverlay: true,
-  },
-  {
-    id: "toystory3",
-    name: "Toy Story 3",
-    description: "",
-    frameSrc: "/frames/toy-story-3.png",
-    background: "#1A3A6B",
     frameOverlay: true,
   },
 ];
