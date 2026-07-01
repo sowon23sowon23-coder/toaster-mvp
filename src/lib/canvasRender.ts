@@ -52,7 +52,7 @@ function getTemplateLayout(templateId: string): TemplateLayout {
       backdropInsetX: 0,
       backdropInsetY: 0,
       backdropRadius: 0,
-      slotLeft: 82,
+      slotLeft: 100,
       slotTop: 168,
       slotWidth: 350,
       slotHeight: 234,
