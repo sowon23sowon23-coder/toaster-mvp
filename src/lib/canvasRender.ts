@@ -29,7 +29,6 @@ type TemplateLayout = {
 const OUTPUT_WIDTH = 483;
 const OUTPUT_HEIGHT = 1376;
 
-const FRAME_CROP_LEFT: Partial<Record<TemplateConfig["id"], number>> = {};
 
 function getTemplateLayout(templateId: string): TemplateLayout {
   if (templateId === "signature") {
@@ -52,9 +51,9 @@ function getTemplateLayout(templateId: string): TemplateLayout {
       backdropInsetX: 0,
       backdropInsetY: 0,
       backdropRadius: 0,
-      slotLeft: 100,
+      slotLeft: 57,
       slotTop: 168,
-      slotWidth: 350,
+      slotWidth: 369,
       slotHeight: 234,
       slotGap: 5,
       watermarkWidth: 0,
@@ -371,21 +370,7 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
   if (options.template.frameOverlay) {
     try {
       const frameImage = await loadImage(options.template.frameSrc);
-      const cropLeft = FRAME_CROP_LEFT[options.template.id] ?? 0;
-      const cropWidth = Math.min(OUTPUT_WIDTH, frameImage.naturalWidth - cropLeft);
-      const cropHeight = Math.min(OUTPUT_HEIGHT, frameImage.naturalHeight);
-
-      ctx.drawImage(
-        frameImage,
-        cropLeft,
-        0,
-        cropWidth,
-        cropHeight,
-        0,
-        0,
-        width,
-        height,
-      );
+      ctx.drawImage(frameImage, 0, 0, width, height);
     } catch {
       // frame overlay load failed — skip silently
     }
