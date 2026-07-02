@@ -46,7 +46,24 @@ function getTemplateLayout(templateId: string): TemplateLayout {
     };
   }
 
-  if (templateId === "toystory1" || templateId === "toystory2" || templateId === "toystory3") {
+  // toy-story-blue.png: 537px wide → scale 0.899 to 483px canvas
+  if (templateId === "toystory1") {
+    return {
+      backdropInsetX: 0,
+      backdropInsetY: 0,
+      backdropRadius: 0,
+      slotLeft: 75,
+      slotTop: 168,
+      slotWidth: 335,
+      slotHeight: 234,
+      slotGap: 5,
+      watermarkWidth: 0,
+      watermarkBottom: 0,
+    };
+  }
+
+  // toy-story-green.png: 501px wide → scale 0.964 to 483px canvas
+  if (templateId === "toystory2") {
     return {
       backdropInsetX: 0,
       backdropInsetY: 0,
@@ -54,6 +71,22 @@ function getTemplateLayout(templateId: string): TemplateLayout {
       slotLeft: 57,
       slotTop: 168,
       slotWidth: 369,
+      slotHeight: 234,
+      slotGap: 5,
+      watermarkWidth: 0,
+      watermarkBottom: 0,
+    };
+  }
+
+  // toy-story-skyblue.png: 543px wide → scale 0.890 to 483px canvas
+  if (templateId === "toystory3") {
+    return {
+      backdropInsetX: 0,
+      backdropInsetY: 0,
+      backdropRadius: 0,
+      slotLeft: 80,
+      slotTop: 168,
+      slotWidth: 328,
       slotHeight: 234,
       slotGap: 5,
       watermarkWidth: 0,
