@@ -305,8 +305,10 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
   const scaleY = height / OUTPUT_HEIGHT;
   const layout = getTemplateLayout(options.template.id);
 
-  ctx.fillStyle = options.template.background;
-  ctx.fillRect(0, 0, width, height);
+  if (options.template.background !== "transparent") {
+    ctx.fillStyle = options.template.background;
+    ctx.fillRect(0, 0, width, height);
+  }
 
   if (options.template.id === "signature") {
     const backdropX = Math.round(layout.backdropInsetX * scaleX);
