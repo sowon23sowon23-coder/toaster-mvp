@@ -32,7 +32,7 @@ const OUTPUT_HEIGHT = 1376;
 // Photo slots are much wider than the captured portrait photo, so most of its height
 // gets cropped away. Anchoring near the top (0 = top, 0.5 = center, 1 = bottom) keeps
 // foreheads/hair in frame instead of centering and risking a cut-off forehead.
-const PHOTO_VERTICAL_ANCHOR = 0.15;
+const PHOTO_VERTICAL_ANCHOR = 0.3;
 
 
 function getTemplateLayout(templateId: string): TemplateLayout {
