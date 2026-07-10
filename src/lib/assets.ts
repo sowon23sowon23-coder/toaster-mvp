@@ -42,7 +42,7 @@ export const TEMPLATES: TemplateConfig[] = [
     name: "Toy Story Frame 1",
     description: "",
     frameSrc: "/frames/toy-story-blue.png",
-    background: "transparent",
+    background: "#4A90C4",
     frameOverlay: true,
   },
   {
@@ -50,7 +50,7 @@ export const TEMPLATES: TemplateConfig[] = [
     name: "Toy Story Frame 2",
     description: "",
     frameSrc: "/frames/toy-story-green.png",
-    background: "transparent",
+    background: "#7AB648",
     frameOverlay: true,
   },
   {
@@ -58,7 +58,7 @@ export const TEMPLATES: TemplateConfig[] = [
     name: "Toy Story Frame 3",
     description: "",
     frameSrc: "/frames/toy-story-skyblue.png",
-    background: "transparent",
+    background: "#87CEEB",
     frameOverlay: true,
   },
   {

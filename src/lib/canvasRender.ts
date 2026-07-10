@@ -47,14 +47,15 @@ function getTemplateLayout(templateId: string): TemplateLayout {
   }
 
   // toy-story-blue.png: 537px wide → scale 0.899 to 483px canvas
+  // slot cutout measured directly from the PNG's alpha channel: native x=[79,448), y=[166,400)
   if (templateId === "toystory1") {
     return {
       backdropInsetX: 0,
       backdropInsetY: 0,
       backdropRadius: 0,
-      slotLeft: 83,
-      slotTop: 168,
-      slotWidth: 335,
+      slotLeft: 71,
+      slotTop: 166,
+      slotWidth: 332,
       slotHeight: 234,
       slotGap: 5,
       watermarkWidth: 0,
@@ -335,9 +336,22 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
     gap: Math.round(layout.slotGap * scaleY),
   };
 
+  // Toy Story frames are transparent die-cuts overlaid on top of the photo; the cutout
+  // edges can't be measured with perfect pixel precision, so the photo is drawn slightly
+  // larger than its slot (same center) to guarantee it reaches every edge of the cutout.
+  // The overscanned edges are hidden under the opaque frame artwork on top.
+  const isToyStoryTemplate = options.template.id === "toystory1"
+    || options.template.id === "toystory2"
+    || options.template.id === "toystory3";
+  const photoOverscan = isToyStoryTemplate ? 1.08 : 1;
+
   for (let i = 0; i < 4; i += 1) {
     const photo = options.photos[i];
     const y = slot.top + i * (slot.height + slot.gap);
+    const photoWidth = slot.width * photoOverscan;
+    const photoHeight = slot.height * photoOverscan;
+    const photoLeft = slot.left - (photoWidth - slot.width) / 2;
+    const photoTop = y - (photoHeight - slot.height) / 2;
 
     ctx.fillStyle = "#f4f0ea";
     ctx.fillRect(slot.left, y, slot.width, slot.height);
@@ -347,9 +361,9 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
       try {
         const image = await loadImageFromBlob(photo);
         ctx.beginPath();
-        ctx.rect(slot.left, y, slot.width, slot.height);
+        ctx.rect(photoLeft, photoTop, photoWidth, photoHeight);
         ctx.clip();
-        drawFilteredCover(ctx, image, slot.left, y, slot.width, slot.height, options.filter);
+        drawFilteredCover(ctx, image, photoLeft, photoTop, photoWidth, photoHeight, options.filter);
       } catch {
         ctx.fillStyle = "#DDD";
         ctx.fillRect(slot.left, y, slot.width, slot.height);
@@ -361,6 +375,15 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
     ctx.strokeStyle = "rgba(0,0,0,0.08)";
     ctx.lineWidth = Math.max(2, Math.round(3 * scaleX));
     ctx.strokeRect(slot.left, y, slot.width, slot.height);
+  }
+
+  if (options.template.frameOverlay) {
+    try {
+      const frameImage = await loadImage(options.template.frameSrc);
+      ctx.drawImage(frameImage, 0, 0, width, height);
+    } catch {
+      // frame overlay load failed — skip silently
+    }
   }
 
   for (const sticker of options.stickers) {
@@ -400,15 +423,6 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#5f2e51";
     ctx.fillText(options.textLine.trim(), width / 2, height - Math.round(18 * scaleY));
-  }
-
-  if (options.template.frameOverlay) {
-    try {
-      const frameImage = await loadImage(options.template.frameSrc);
-      ctx.drawImage(frameImage, 0, 0, width, height);
-    } catch {
-      // frame overlay load failed — skip silently
-    }
   }
 
   try {
