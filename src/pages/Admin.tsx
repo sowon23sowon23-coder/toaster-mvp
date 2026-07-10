@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FILTERS, FONTS, TEMPLATES, TemplateId } from "../lib/assets";
+import { captureVideoFrame, startPreferredCamera, stopCamera } from "../lib/camera";
 import {
   TemplateLayout,
   getDefaultPhotoOverscan,
@@ -11,67 +12,6 @@ import { usePhotoboothStore } from "../store/usePhotoboothStore";
 
 const PHOTO_VERTICAL_ANCHOR_DEFAULT = 0.3;
 
-function createPlaceholderPhotoBlob(): Promise<Blob> {
-  const canvas = document.createElement("canvas");
-  canvas.width = 1080;
-  canvas.height = 1350;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return Promise.reject(new Error("Canvas is not supported."));
-
-  ctx.fillStyle = "#e7e1d8";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Horizontal reference lines every 100px so crop position is easy to read.
-  ctx.strokeStyle = "rgba(0,0,0,0.12)";
-  ctx.lineWidth = 2;
-  ctx.font = "26px sans-serif";
-  ctx.fillStyle = "rgba(0,0,0,0.35)";
-  for (let y = 0; y < canvas.height; y += 100) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(canvas.width, y);
-    ctx.stroke();
-    ctx.fillText(String(y), 10, y + 24);
-  }
-
-  // A simple face-like shape positioned like a typical portrait selfie.
-  ctx.fillStyle = "#caa07a";
-  ctx.beginPath();
-  ctx.ellipse(540, 430, 240, 300, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = "#2b2320";
-  ctx.beginPath();
-  ctx.ellipse(450, 400, 22, 30, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(630, 400, 22, 30, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.strokeStyle = "#7a4a35";
-  ctx.lineWidth = 8;
-  ctx.beginPath();
-  ctx.arc(540, 520, 70, 0.15 * Math.PI, 0.85 * Math.PI);
-  ctx.stroke();
-
-  ctx.fillStyle = "#3d2a1f";
-  ctx.beginPath();
-  ctx.ellipse(540, 160, 280, 160, 0, Math.PI, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = "rgba(0,0,0,0.5)";
-  ctx.font = "bold 34px sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText("SAMPLE PHOTO 1080x1350", canvas.width / 2, canvas.height - 40);
-
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (!blob) return reject(new Error("Failed to render placeholder."));
-      resolve(blob);
-    }, "image/png");
-  });
-}
-
 export default function Admin() {
   const navigate = useNavigate();
   const storePhotos = usePhotoboothStore((state) => state.photos);
@@ -81,9 +21,15 @@ export default function Admin() {
   const [photoOverscan, setPhotoOverscan] = useState(() => getDefaultPhotoOverscan(TEMPLATES[0].id));
   const [verticalAnchor, setVerticalAnchor] = useState(PHOTO_VERTICAL_ANCHOR_DEFAULT);
 
-  const [placeholderPhotos, setPlaceholderPhotos] = useState<Blob[] | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [capturedPhoto, setCapturedPhoto] = useState<Blob | null>(null);
+  const [capturedPhotoUrl, setCapturedPhotoUrl] = useState<string | null>(null);
 
   const template = useMemo(
     () => TEMPLATES.find((item) => item.id === templateId) ?? TEMPLATES[0],
@@ -91,8 +37,53 @@ export default function Admin() {
   );
 
   useEffect(() => {
-    void createPlaceholderPhotoBlob().then((blob) => setPlaceholderPhotos([blob, blob, blob, blob]));
+    return () => stopCamera(streamRef.current);
   }, []);
+
+  useEffect(() => {
+    if (!capturedPhoto) {
+      setCapturedPhotoUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(capturedPhoto);
+    setCapturedPhotoUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [capturedPhoto]);
+
+  async function startCamera() {
+    setCameraError(null);
+    try {
+      const stream = await startPreferredCamera();
+      streamRef.current = stream;
+      const video = videoRef.current;
+      if (!video) throw new Error("Video element not ready.");
+      video.srcObject = stream;
+      video.playsInline = true;
+      video.muted = true;
+      await video.play();
+      setCameraActive(true);
+    } catch (error) {
+      setCameraError(error instanceof Error ? error.message : "Camera access failed.");
+    }
+  }
+
+  async function takePhoto() {
+    if (!videoRef.current) return;
+    try {
+      const blob = await captureVideoFrame(videoRef.current);
+      setCapturedPhoto(blob);
+      stopCamera(streamRef.current);
+      streamRef.current = null;
+      setCameraActive(false);
+    } catch (error) {
+      setCameraError(error instanceof Error ? error.message : "Capture failed.");
+    }
+  }
+
+  function retakePhoto() {
+    setCapturedPhoto(null);
+    void startCamera();
+  }
 
   function selectTemplate(id: TemplateId) {
     setTemplateId(id);
@@ -101,7 +92,11 @@ export default function Admin() {
     setVerticalAnchor(PHOTO_VERTICAL_ANCHOR_DEFAULT);
   }
 
-  const photos = storePhotos.length === 4 ? storePhotos : placeholderPhotos;
+  const photos = capturedPhoto
+    ? [capturedPhoto, capturedPhoto, capturedPhoto, capturedPhoto]
+    : storePhotos.length === 4
+      ? storePhotos
+      : null;
 
   useEffect(() => {
     if (!photos) return;
@@ -184,7 +179,70 @@ slotGap: ${layout.slotGap},
         <div className="page-header-text">
           <div className="page-header-title">Frame Layout Admin</div>
           <div className="page-header-sub">
-            {storePhotos.length === 4 ? "Using your captured photos" : "Using placeholder photo (capture 4 photos first to preview with real shots)"}
+            {capturedPhoto
+              ? "Using the photo you just took"
+              : storePhotos.length === 4
+                ? "Using your captured photos"
+                : "Take a photo below to preview with a real shot"}
+          </div>
+        </div>
+      </div>
+
+      <div className="panel" style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 10 }}>
+        <label style={{ fontWeight: 700, fontSize: "0.85rem" }}>Test Photo</label>
+        <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <div style={{ width: 160, aspectRatio: "4 / 5", background: "#000", borderRadius: 10, overflow: "hidden", position: "relative" }}>
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              playsInline
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: cameraActive ? "block" : "none" }}
+            />
+            {!cameraActive && capturedPhotoUrl && (
+              <img
+                src={capturedPhotoUrl}
+                alt="Captured test photo"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            )}
+            {!cameraActive && !capturedPhoto && (
+              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#888", fontSize: "0.7rem", textAlign: "center", padding: 8 }}>
+                No camera yet
+              </div>
+            )}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {!cameraActive && !capturedPhoto && (
+              <button
+                type="button"
+                onClick={() => void startCamera()}
+                style={{ padding: "8px 14px", borderRadius: 10, border: "1px solid var(--line)", background: "var(--panel)", fontWeight: 700, cursor: "pointer" }}
+              >
+                카메라 켜기
+              </button>
+            )}
+            {cameraActive && (
+              <button
+                type="button"
+                onClick={() => void takePhoto()}
+                style={{ padding: "8px 14px", borderRadius: 10, border: "none", background: "var(--primary, #d1477a)", color: "#fff", fontWeight: 700, cursor: "pointer" }}
+              >
+                촬영
+              </button>
+            )}
+            {capturedPhoto && (
+              <button
+                type="button"
+                onClick={retakePhoto}
+                style={{ padding: "8px 14px", borderRadius: 10, border: "1px solid var(--line)", background: "var(--panel)", fontWeight: 700, cursor: "pointer" }}
+              >
+                다시 찍기
+              </button>
+            )}
+            {cameraError && (
+              <p style={{ fontSize: "0.72rem", color: "#c0392b", maxWidth: 220 }}>{cameraError}</p>
+            )}
           </div>
         </div>
       </div>
@@ -281,7 +339,11 @@ slotGap: ${layout.slotGap},`}
         </div>
 
         <div className="panel" style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: 12 }}>
-          {previewUrl ? (
+          {!photos ? (
+            <p style={{ fontSize: "0.8rem", color: "var(--muted)", textAlign: "center" }}>
+              위에서 사진을 한 장 찍으면 미리보기가 나타납니다.
+            </p>
+          ) : previewUrl ? (
             <img src={previewUrl} alt="Live layout preview" style={{ width: "100%", borderRadius: 12, display: "block" }} />
           ) : (
             <p style={{ fontSize: "0.8rem", color: "var(--muted)" }}>Rendering...</p>
