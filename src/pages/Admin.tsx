@@ -5,12 +5,11 @@ import { captureVideoFrame, startPreferredCamera, stopCamera } from "../lib/came
 import {
   TemplateLayout,
   getDefaultPhotoOverscan,
+  getDefaultVerticalAnchor,
   getTemplateLayout,
   renderPhotoboothImage,
 } from "../lib/canvasRender";
 import { usePhotoboothStore } from "../store/usePhotoboothStore";
-
-const PHOTO_VERTICAL_ANCHOR_DEFAULT = 0.3;
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -19,7 +18,7 @@ export default function Admin() {
   const [templateId, setTemplateId] = useState<TemplateId>(TEMPLATES[0].id);
   const [layout, setLayout] = useState<TemplateLayout>(() => getTemplateLayout(TEMPLATES[0].id));
   const [photoOverscan, setPhotoOverscan] = useState(() => getDefaultPhotoOverscan(TEMPLATES[0].id));
-  const [verticalAnchor, setVerticalAnchor] = useState(PHOTO_VERTICAL_ANCHOR_DEFAULT);
+  const [verticalAnchor, setVerticalAnchor] = useState(() => getDefaultVerticalAnchor(TEMPLATES[0].id));
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -89,7 +88,7 @@ export default function Admin() {
     setTemplateId(id);
     setLayout(getTemplateLayout(id));
     setPhotoOverscan(getDefaultPhotoOverscan(id));
-    setVerticalAnchor(PHOTO_VERTICAL_ANCHOR_DEFAULT);
+    setVerticalAnchor(getDefaultVerticalAnchor(id));
   }
 
   const photos = capturedPhoto
@@ -142,13 +141,14 @@ export default function Admin() {
   }
 
   function copySnippet() {
-    const snippet = `slotLeft: ${layout.slotLeft},
+    const snippet = `// ${templateId}
+slotLeft: ${layout.slotLeft},
 slotTop: ${layout.slotTop},
 slotWidth: ${layout.slotWidth},
 slotHeight: ${layout.slotHeight},
 slotGap: ${layout.slotGap},
-// photoOverscan: ${photoOverscan.toFixed(2)} (shared const, not per-template)
-// verticalAnchor: ${verticalAnchor.toFixed(2)} (shared const, not per-template)`;
+// add to PHOTO_OVERSCAN_BY_TEMPLATE: ${templateId}: ${photoOverscan.toFixed(2)},
+// add to VERTICAL_ANCHOR_BY_TEMPLATE: ${templateId}: ${verticalAnchor.toFixed(2)},`;
     void navigator.clipboard.writeText(snippet).then(() => {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
@@ -324,16 +324,19 @@ slotGap: ${layout.slotGap},
               </button>
             </div>
             <pre style={{ marginTop: 6, background: "#1f1a24", color: "#f4eef8", padding: 10, borderRadius: 10, fontSize: "0.72rem", overflowX: "auto" }}>
-{`slotLeft: ${layout.slotLeft},
+{`// ${templateId}
+slotLeft: ${layout.slotLeft},
 slotTop: ${layout.slotTop},
 slotWidth: ${layout.slotWidth},
 slotHeight: ${layout.slotHeight},
-slotGap: ${layout.slotGap},`}
+slotGap: ${layout.slotGap},
+// PHOTO_OVERSCAN_BY_TEMPLATE.${templateId} = ${photoOverscan.toFixed(2)}
+// VERTICAL_ANCHOR_BY_TEMPLATE.${templateId} = ${verticalAnchor.toFixed(2)}`}
             </pre>
             <p style={{ fontSize: "0.7rem", color: "var(--muted)", marginTop: 4 }}>
-              Overscan/anchor are shared constants across templates in the current code
-              (<code>getDefaultPhotoOverscan</code>, <code>PHOTO_VERTICAL_ANCHOR</code>) — say so if you want
-              them made per-template too.
+              Overscan/anchor now support per-template overrides in
+              <code> PHOTO_OVERSCAN_BY_TEMPLATE</code>/<code>VERTICAL_ANCHOR_BY_TEMPLATE</code> in
+              canvasRender.ts — paste these lines there for this template.
             </p>
           </div>
         </div>

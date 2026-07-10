@@ -38,14 +38,34 @@ const OUTPUT_HEIGHT = 1376;
 // Photo slots are much wider than the captured portrait photo, so most of its height
 // gets cropped away. Anchoring near the top (0 = top, 0.5 = center, 1 = bottom) keeps
 // foreheads/hair in frame instead of centering and risking a cut-off forehead.
-export const PHOTO_VERTICAL_ANCHOR = 0.3;
+const DEFAULT_PHOTO_VERTICAL_ANCHOR = 0.3;
+const DEFAULT_TOY_STORY_OVERSCAN = 1.08;
+
+// Per-template tuning, set via the /admin layout tool. Falls back to the shared
+// defaults below when a template has no entry of its own.
+const PHOTO_OVERSCAN_BY_TEMPLATE: Partial<Record<string, number>> = {
+  toystory1: 1,
+  toystory2: 1,
+  toystory3: 1,
+};
+
+const VERTICAL_ANCHOR_BY_TEMPLATE: Partial<Record<string, number>> = {
+  toystory1: 0.34,
+  toystory2: 0.46,
+  toystory3: 0.3,
+};
 
 export function isToyStoryTemplateId(templateId: string): boolean {
   return templateId === "toystory1" || templateId === "toystory2" || templateId === "toystory3";
 }
 
 export function getDefaultPhotoOverscan(templateId: string): number {
-  return isToyStoryTemplateId(templateId) ? 1.08 : 1;
+  return PHOTO_OVERSCAN_BY_TEMPLATE[templateId]
+    ?? (isToyStoryTemplateId(templateId) ? DEFAULT_TOY_STORY_OVERSCAN : 1);
+}
+
+export function getDefaultVerticalAnchor(templateId: string): number {
+  return VERTICAL_ANCHOR_BY_TEMPLATE[templateId] ?? DEFAULT_PHOTO_VERTICAL_ANCHOR;
 }
 
 export function getTemplateLayout(templateId: string): TemplateLayout {
@@ -66,13 +86,14 @@ export function getTemplateLayout(templateId: string): TemplateLayout {
 
   // toy-story-blue.png: 537px wide → scale 0.899 to 483px canvas
   // slot cutout measured directly from the PNG's alpha channel: native x=[79,448), y=[166,400)
+  // slotTop nudged to 169 via /admin tuning.
   if (templateId === "toystory1") {
     return {
       backdropInsetX: 0,
       backdropInsetY: 0,
       backdropRadius: 0,
       slotLeft: 71,
-      slotTop: 166,
+      slotTop: 169,
       slotWidth: 332,
       slotHeight: 234,
       slotGap: 5,
@@ -99,6 +120,7 @@ export function getTemplateLayout(templateId: string): TemplateLayout {
 
   // toy-story-skyblue.png: 543px wide → scale 0.890 to 483px canvas
   // slot cutout measured directly from the PNG's alpha channel: native x=[89,458), y=[166,400)
+  // slotHeight/slotGap adjusted via /admin tuning.
   if (templateId === "toystory3") {
     return {
       backdropInsetX: 0,
@@ -107,8 +129,8 @@ export function getTemplateLayout(templateId: string): TemplateLayout {
       slotLeft: 79,
       slotTop: 166,
       slotWidth: 328,
-      slotHeight: 234,
-      slotGap: 5,
+      slotHeight: 237,
+      slotGap: 0,
       watermarkWidth: 0,
       watermarkBottom: 0,
     };
@@ -378,7 +400,7 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
   // larger than its slot (same center) to guarantee it reaches every edge of the cutout.
   // The overscanned edges are hidden under the opaque frame artwork on top.
   const photoOverscan = options.photoOverscanOverride ?? getDefaultPhotoOverscan(options.template.id);
-  const verticalAnchor = options.verticalAnchorOverride ?? PHOTO_VERTICAL_ANCHOR;
+  const verticalAnchor = options.verticalAnchorOverride ?? getDefaultVerticalAnchor(options.template.id);
 
   for (let i = 0; i < 4; i += 1) {
     const photo = options.photos[i];
