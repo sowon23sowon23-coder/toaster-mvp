@@ -113,6 +113,22 @@ function getTemplateLayout(templateId: string): TemplateLayout {
     };
   }
 
+  // Matches toystory4's photo slot position/size per request.
+  if (templateId === "sprinkle") {
+    return {
+      backdropInsetX: 0,
+      backdropInsetY: 0,
+      backdropRadius: 0,
+      slotLeft: 71,
+      slotTop: 165,
+      slotWidth: 332,
+      slotHeight: 234,
+      slotGap: 5,
+      watermarkWidth: 96,
+      watermarkBottom: 22,
+    };
+  }
+
   if (templateId === "soccer") {
     return {
       backdropInsetX: 0,
