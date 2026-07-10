@@ -11,9 +11,15 @@ type RenderOptions = {
   watermarkSrc: string;
   width?: number;
   height?: number;
+  // Live tuning overrides (used by the /admin layout tool) — merged over the
+  // template's default layout/overscan/anchor so the preview renders through
+  // the exact same code path production uses.
+  layoutOverride?: Partial<TemplateLayout>;
+  photoOverscanOverride?: number;
+  verticalAnchorOverride?: number;
 };
 
-type TemplateLayout = {
+export type TemplateLayout = {
   backdropInsetX: number;
   backdropInsetY: number;
   backdropRadius: number;
@@ -32,10 +38,17 @@ const OUTPUT_HEIGHT = 1376;
 // Photo slots are much wider than the captured portrait photo, so most of its height
 // gets cropped away. Anchoring near the top (0 = top, 0.5 = center, 1 = bottom) keeps
 // foreheads/hair in frame instead of centering and risking a cut-off forehead.
-const PHOTO_VERTICAL_ANCHOR = 0.3;
+export const PHOTO_VERTICAL_ANCHOR = 0.3;
 
+export function isToyStoryTemplateId(templateId: string): boolean {
+  return templateId === "toystory1" || templateId === "toystory2" || templateId === "toystory3";
+}
 
-function getTemplateLayout(templateId: string): TemplateLayout {
+export function getDefaultPhotoOverscan(templateId: string): number {
+  return isToyStoryTemplateId(templateId) ? 1.08 : 1;
+}
+
+export function getTemplateLayout(templateId: string): TemplateLayout {
   if (templateId === "signature") {
     return {
       backdropInsetX: 12,
@@ -328,7 +341,7 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
 
   const scaleX = width / OUTPUT_WIDTH;
   const scaleY = height / OUTPUT_HEIGHT;
-  const layout = getTemplateLayout(options.template.id);
+  const layout = { ...getTemplateLayout(options.template.id), ...options.layoutOverride };
 
   if (options.template.background !== "transparent") {
     ctx.fillStyle = options.template.background;
@@ -364,10 +377,8 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
   // edges can't be measured with perfect pixel precision, so the photo is drawn slightly
   // larger than its slot (same center) to guarantee it reaches every edge of the cutout.
   // The overscanned edges are hidden under the opaque frame artwork on top.
-  const isToyStoryTemplate = options.template.id === "toystory1"
-    || options.template.id === "toystory2"
-    || options.template.id === "toystory3";
-  const photoOverscan = isToyStoryTemplate ? 1.08 : 1;
+  const photoOverscan = options.photoOverscanOverride ?? getDefaultPhotoOverscan(options.template.id);
+  const verticalAnchor = options.verticalAnchorOverride ?? PHOTO_VERTICAL_ANCHOR;
 
   for (let i = 0; i < 4; i += 1) {
     const photo = options.photos[i];
@@ -395,7 +406,7 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
           photoWidth,
           photoHeight,
           options.filter,
-          PHOTO_VERTICAL_ANCHOR,
+          verticalAnchor,
         );
       } catch {
         ctx.fillStyle = "#DDD";
