@@ -1,4 +1,4 @@
-export type TemplateId = "signature" | "toystory1" | "toystory2" | "toystory3" | "sprinkle" | "minimal" | "soccer";
+export type TemplateId = "signature" | "toystory1" | "toystory2" | "toystory3" | "toystory4" | "sprinkle" | "minimal" | "soccer";
 export type FilterId = "none" | "soft" | "vivid" | "cool" | "mono";
 export type FontId = "sans" | "serif" | "mono";
 
@@ -59,6 +59,14 @@ export const TEMPLATES: TemplateConfig[] = [
     description: "",
     frameSrc: "/frames/toy-story-skyblue.png",
     background: "#87CEEB",
+    frameOverlay: true,
+  },
+  {
+    id: "toystory4",
+    name: "Toy Story Frame 4",
+    description: "",
+    frameSrc: "/frames/Frame 76.png",
+    background: "#4A90C4",
     frameOverlay: true,
   },
   {

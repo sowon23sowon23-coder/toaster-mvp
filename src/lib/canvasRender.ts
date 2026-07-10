@@ -96,6 +96,23 @@ function getTemplateLayout(templateId: string): TemplateLayout {
     };
   }
 
+  // Frame 76.png: 806x2064, with transparent padding around the opaque art.
+  // slot cutout measured directly from the PNG's alpha channel: native x=[119,672), y=[248,598) for slot 1
+  if (templateId === "toystory4") {
+    return {
+      backdropInsetX: 0,
+      backdropInsetY: 0,
+      backdropRadius: 0,
+      slotLeft: 71,
+      slotTop: 165,
+      slotWidth: 332,
+      slotHeight: 234,
+      slotGap: 5,
+      watermarkWidth: 0,
+      watermarkBottom: 0,
+    };
+  }
+
   if (templateId === "soccer") {
     return {
       backdropInsetX: 0,
@@ -343,7 +360,8 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
   // The overscanned edges are hidden under the opaque frame artwork on top.
   const isToyStoryTemplate = options.template.id === "toystory1"
     || options.template.id === "toystory2"
-    || options.template.id === "toystory3";
+    || options.template.id === "toystory3"
+    || options.template.id === "toystory4";
   const photoOverscan = isToyStoryTemplate ? 1.08 : 1;
 
   for (let i = 0; i < 4; i += 1) {
