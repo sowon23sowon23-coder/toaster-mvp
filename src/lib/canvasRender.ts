@@ -80,13 +80,14 @@ function getTemplateLayout(templateId: string): TemplateLayout {
   }
 
   // toy-story-skyblue.png: 543px wide → scale 0.890 to 483px canvas
+  // slot cutout measured directly from the PNG's alpha channel: native x=[89,458), y=[166,400)
   if (templateId === "toystory3") {
     return {
       backdropInsetX: 0,
       backdropInsetY: 0,
       backdropRadius: 0,
-      slotLeft: 88,
-      slotTop: 168,
+      slotLeft: 79,
+      slotTop: 166,
       slotWidth: 328,
       slotHeight: 234,
       slotGap: 5,
@@ -380,7 +381,13 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
   if (options.template.frameOverlay) {
     try {
       const frameImage = await loadImage(options.template.frameSrc);
+      // Frame art has hard-edged (non-antialiased) cutouts, including irregular shapes
+      // like the scalloped Toy Story 2 slot. Bilinear smoothing during the downscale to
+      // canvas size blurs those cutout edges into semi-transparent fringes that visibly
+      // mismatch the photo's straight rectangular crop underneath, so it's disabled here.
+      ctx.imageSmoothingEnabled = false;
       ctx.drawImage(frameImage, 0, 0, width, height);
+      ctx.imageSmoothingEnabled = true;
     } catch {
       // frame overlay load failed — skip silently
     }
