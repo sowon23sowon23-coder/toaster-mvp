@@ -113,6 +113,23 @@ function getTemplateLayout(templateId: string): TemplateLayout {
     };
   }
 
+  // 연습.png: 537x1376, same layout family as toystory1/toystory4.
+  // slot cutout measured directly from the PNG's alpha channel: native x=[79,448), y=[165,399)
+  if (templateId === "toystory5") {
+    return {
+      backdropInsetX: 0,
+      backdropInsetY: 0,
+      backdropRadius: 0,
+      slotLeft: 71,
+      slotTop: 165,
+      slotWidth: 332,
+      slotHeight: 234,
+      slotGap: 5,
+      watermarkWidth: 0,
+      watermarkBottom: 0,
+    };
+  }
+
   // Matches toystory4's photo slot position/size per request.
   if (templateId === "sprinkle") {
     return {
@@ -377,7 +394,8 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
   const isToyStoryTemplate = options.template.id === "toystory1"
     || options.template.id === "toystory2"
     || options.template.id === "toystory3"
-    || options.template.id === "toystory4";
+    || options.template.id === "toystory4"
+    || options.template.id === "toystory5";
   const photoOverscan = isToyStoryTemplate ? 1.08 : 1;
 
   for (let i = 0; i < 4; i += 1) {
