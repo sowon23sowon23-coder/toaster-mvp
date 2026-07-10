@@ -29,6 +29,11 @@ type TemplateLayout = {
 const OUTPUT_WIDTH = 483;
 const OUTPUT_HEIGHT = 1376;
 
+// Photo slots are much wider than the captured portrait photo, so most of its height
+// gets cropped away. Anchoring near the top (0 = top, 0.5 = center, 1 = bottom) keeps
+// foreheads/hair in frame instead of centering and risking a cut-off forehead.
+const PHOTO_VERTICAL_ANCHOR = 0.15;
+
 
 function getTemplateLayout(templateId: string): TemplateLayout {
   if (templateId === "signature") {
@@ -217,6 +222,7 @@ function drawCover(
   y: number,
   width: number,
   height: number,
+  verticalAnchor = 0.5,
 ) {
   const sourceWidth = image.naturalWidth || image.width;
   const sourceHeight = image.naturalHeight || image.height;
@@ -224,7 +230,7 @@ function drawCover(
   const drawWidth = sourceWidth * scale;
   const drawHeight = sourceHeight * scale;
   const dx = x + (width - drawWidth) / 2;
-  const dy = y + (height - drawHeight) / 2;
+  const dy = y - (drawHeight - height) * verticalAnchor;
   ctx.drawImage(image, dx, dy, drawWidth, drawHeight);
 }
 
@@ -318,17 +324,18 @@ function drawFilteredCover(
   width: number,
   height: number,
   filter: FilterConfig,
+  verticalAnchor = 0.5,
 ) {
   const buffer = document.createElement("canvas");
   buffer.width = width;
   buffer.height = height;
   const bufferCtx = buffer.getContext("2d", { willReadFrequently: true });
   if (!bufferCtx) {
-    drawCover(ctx, image, x, y, width, height);
+    drawCover(ctx, image, x, y, width, height, verticalAnchor);
     return;
   }
 
-  drawCover(bufferCtx, image, 0, 0, width, height);
+  drawCover(bufferCtx, image, 0, 0, width, height, verticalAnchor);
 
   if (filter.id !== "none") {
     try {
@@ -416,7 +423,16 @@ export async function renderPhotoboothImage(options: RenderOptions): Promise<Blo
         ctx.beginPath();
         ctx.rect(photoLeft, photoTop, photoWidth, photoHeight);
         ctx.clip();
-        drawFilteredCover(ctx, image, photoLeft, photoTop, photoWidth, photoHeight, options.filter);
+        drawFilteredCover(
+          ctx,
+          image,
+          photoLeft,
+          photoTop,
+          photoWidth,
+          photoHeight,
+          options.filter,
+          PHOTO_VERTICAL_ANCHOR,
+        );
       } catch {
         ctx.fillStyle = "#DDD";
         ctx.fillRect(slot.left, y, slot.width, slot.height);
