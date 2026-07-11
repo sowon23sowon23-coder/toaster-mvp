@@ -134,7 +134,6 @@ const STICKER_FILES = [
   "sticker15.png",
   "sticker16.png",
   "sticker17.png",
-  "sticker18.png",
 ] as const;
 
 export const STICKER_ASSETS = STICKER_FILES.map((fileName) => `/stickers/${fileName}`);
